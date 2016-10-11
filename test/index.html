@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+    </head>
+    <body>
+        <script src="../dist/query-hash.min.js"></script>
+        <script>
+            console.log(QueryHash);
+            var q = new QueryHash.default();
+            q.add('test', 'passed');
+	    q.add('another', 'one');
+            console.log(q.toString());
+	    console.log(q.toUrlToken());
+        </script>
+    </body>
+</html>

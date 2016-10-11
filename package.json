@@ -1,0 +1,19 @@
+{
+  "name": "query-hash",
+  "version": "0.0.1",
+  "description": "hash query strings easily",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "export NODE_ENV=prod && webpack -p",
+    "watch": "export NODE_ENV=dev && webpack --watch"
+  },
+  "author": "@bcruddy",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.16.0",
+    "chai": "^3.5.0"
+  }
+}
