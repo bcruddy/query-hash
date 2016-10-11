@@ -1,8 +1,9 @@
 {
   "name": "query-hash",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "hash query strings easily",
   "main": "dist/query-hash.js",
+  "repository": "https://github.com/bcruddy/query-hash",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "export NODE_ENV=prod && webpack -p",
