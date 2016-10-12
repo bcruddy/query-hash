@@ -1,0 +1,18 @@
+{
+  "name": "query-hash",
+  "description": "hash query strings easily",
+  "main": "dist/query-hash.js",
+  "authors": [
+    "@bcruddy"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/bcruddy/query-hash",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
