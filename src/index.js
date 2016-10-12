@@ -2,4 +2,4 @@
 
 import QueryHash from './QueryHash';
 
-export default QueryHash;
+module.exports = QueryHash;

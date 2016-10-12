@@ -5,13 +5,17 @@
         <title></title>
     </head>
     <body>
-        <script src="../dist/query-hash.min.js"></script>
+        <script src="../dist/query-hash.js"></script>
         <script>
-            var q = new QueryHash.default();
+            var q = new QueryHash();
             q.add('test', 'passed');
 	        q.add('another', 'one');
             console.log(q.toString());
 	        console.log(q.toUrlToken());
+            
+            var q2 = new QueryHash();
+            q2.fromUrlToken(q.toUrlToken());
+            console.log(q2.keys());
         </script>
     </body>
 </html>

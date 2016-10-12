@@ -47,17 +47,13 @@ var QueryHash =
 
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
 	var _QueryHash = __webpack_require__(1);
 
 	var _QueryHash2 = _interopRequireDefault(_QueryHash);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = _QueryHash2.default;
+	module.exports = _QueryHash2.default;
 
 /***/ },
 /* 1 */
@@ -77,7 +73,7 @@ var QueryHash =
 	    function QueryHash() {
 	        _classCallCheck(this, QueryHash);
 
-	        this.items = {};
+	        this._items = {};
 
 	        return this;
 	    }
@@ -89,29 +85,45 @@ var QueryHash =
 	                throw new Error('QueryHash.add expects 2 paramters, ' + arguments.length + ' given.');
 	            }
 
-	            if (this.items.hasOwnProperty(name)) {
-	                throw new Error('Property already exists in QueryHash instance');
+	            if (this._items.hasOwnProperty(name)) {
+	                throw new Error('Property "' + name + '" already exists in QueryHash instance');
 	            }
 
-	            this.items[name] = val;
+	            this._items[name] = val;
 
 	            return this;
 	        }
 	    }, {
 	        key: 'remove',
 	        value: function remove(name) {
-	            if (name === void 0) {
-	                throw new Error('QueryHash.remove expects one parameter.');
+	            if (arguments.length !== 1) {
+	                throw new Error('QueryHash.remove expects one parameter, ' + arguments.length + ' given.');
 	            }
-
 	            // do we really need to throw an error here? Or just skip the delete statement?
-	            if (!this.items.hasOwnProperty(name)) {
-	                throw new Error('Item does not exist in instance of QueryHash');
+	            if (!this._items.hasOwnProperty(name)) {
+	                throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
 	            }
 
-	            delete this.items[name];
+	            delete this._items[name];
 
 	            return this;
+	        }
+	    }, {
+	        key: 'find',
+	        value: function find(name) {
+	            if (arguments.length !== 1) {
+	                throw new Error('QueryHash.find expects one parameter, ' + arguments.length + ' given.');
+	            }
+	            if (!this._items.hasOwnProperty(name)) {
+	                throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
+	            }
+
+	            return this._items[name];
+	        }
+	    }, {
+	        key: 'keys',
+	        value: function keys() {
+	            return Object.keys(this._items);
 	        }
 	    }, {
 	        key: 'toUrlToken',
@@ -123,8 +135,8 @@ var QueryHash =
 	        value: function toString() {
 	            var qs = '';
 
-	            for (var key in this.items) {
-	                var val = this.items[key];
+	            for (var key in this._items) {
+	                var val = this._items[key];
 
 	                if (!qs.length) {
 	                    qs += encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
@@ -145,7 +157,7 @@ var QueryHash =
 	                throw new Error('QueryHash.fromUrlToken expects input to be of type string. Type ' + Object.prototype.toString.call(urlToken) + ' provided');
 	            }
 
-	            this.items = this.fromInput(urlToken, true);
+	            this._items = this._fromInput(urlToken, true);
 
 	            return this;
 	        }
@@ -153,21 +165,20 @@ var QueryHash =
 	        key: 'fromQueryString',
 	        value: function fromQueryString(qs) {
 	            if (arguments.length !== 1) {
-	                throw new Error('QueryHash.fromUrlToken expects 1 parameter. ' + arguments.length + ' given.');
+	                throw new Error('QueryHash.fromQueryString expects 1 parameter. ' + arguments.length + ' given.');
 	            }
-	            if (typeof urlToken !== 'string') {
-	                throw new Error('QueryHash.fromUrlToken expects input to be of type string. Type ' + Object.prototype.toString.call(urlToken) + ' provided');
+	            if (typeof qs !== 'string') {
+	                throw new Error('QueryHash.fromQueryString expects input to be of type string. Type ' + Object.prototype.toString.call(qs) + ' provided');
 	            }
 
-	            this.items = this.fromInput(qs, false);
+	            this._items = this._fromInput(qs, false);
 
 	            return this;
 	        }
 	    }, {
 	        key: '_fromInput',
 	        value: function _fromInput(input, isBase64) {
-	            var qs = void 0;
-	            if (isBase64) qs = btoa(input);else qs = input;
+	            var qs = isBase64 ? atob(input) : input;
 
 	            if (qs.indexOf('?') === 0) {
 	                qs = qs.slice(1);
@@ -176,7 +187,7 @@ var QueryHash =
 	            var obj = {};
 	            qs.split('&').forEach(function (kv) {
 	                kv = kv.split('=');
-	                obj[pair[0]] = decodeURIComponent(pair[1] || '').replace(/\+/g, ' ');
+	                obj[kv[0]] = decodeURIComponent(kv[1] || '').replace(/\+/g, ' ');
 	            });
 
 	            return JSON.parse(JSON.stringify(obj));
