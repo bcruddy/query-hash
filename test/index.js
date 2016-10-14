@@ -90,7 +90,7 @@ describe('QueryHash.toString method', function () {
 
 describe('QueryHash.fromQueryString method', function () {
     let q = new QueryHash();
-    it('Should accept a query string and modify it', function () {
+    it('Should accept a querystring correctly', function () {
         q.fromQueryString('test=passed&again=hooray');
 
         expect(q.keys()).to.deep.equal(['test', 'again']);
