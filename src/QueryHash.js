@@ -9,7 +9,7 @@ class QueryHash {
 
     add(name, val) {
         if (arguments.length !== 2) {
-            throw new Error(`QueryHash.add expects 2 paramters, ${arguments.length} given.`);
+            throw new Error(`QueryHash.add expects 2 parameters, ${arguments.length} given.`);
         }
 
         if (this._items.hasOwnProperty(name)) {
@@ -51,7 +51,11 @@ class QueryHash {
     }
 
     toUrlToken() {
-        return btoa(this.toString());
+        let isLikelyNode = typeof window === 'undefined';
+        if (isLikelyNode)
+            return new Buffer(this.toString()).toString('base64');
+        else
+            return btoa(this.toString());
     }
 
     toString() {
@@ -98,7 +102,12 @@ class QueryHash {
     }
 
     _fromInput(input, isBase64) {
-        let qs = isBase64 ? atob(input) : input;
+        let isLikelyNode = typeof window === 'undefined';
+        let qs;
+        if (isLikelyNode)
+            qs = isBase64 ? new Buffer(input, 'base64').toString() : input;
+        else
+            qs = isBase64 ? atob(input) : input;
 
         if (qs.indexOf('?') === 0) {
             qs = qs.slice(1);
