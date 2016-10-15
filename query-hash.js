@@ -123,7 +123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (arguments.length !== 1) {
 	                throw new Error('QueryHash.find expects one parameter, ' + arguments.length + ' given.');
 	            }
-	            if (!this._items.hasOwnProperty(name)) {
+	            if (!this.has(name)) {
 	                throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
 	            }
 
@@ -133,6 +133,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'keys',
 	        value: function keys() {
 	            return Object.keys(this._items);
+	        }
+	    }, {
+	        key: 'has',
+	        value: function has(key) {
+	            return !!this._items[key];
 	        }
 	    }, {
 	        key: 'toUrlToken',

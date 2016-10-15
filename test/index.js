@@ -14,8 +14,8 @@ describe('QueryHash Constructor', function () {
             hasError = true;
         }
 
-        expect(q).to.be.an.instanceof(QueryHash);
         expect(hasError).to.equal(false);
+        expect(q).to.be.an.instanceof(QueryHash);
     });
 });
 
@@ -44,6 +44,8 @@ describe('QueryHash.remove method', function () {
     q.add('remove', 'me');
 
     it('Should remove a key-value by its key', function () {
+        expect(q.keys()).to.have.lengthOf(1);
+
         q.remove('remove');
 
         expect(q.keys()).to.have.lengthOf(0);
@@ -56,15 +58,27 @@ describe('QueryHash.remove method', function () {
 
 describe('QueryHash.find method', function () {
     let q = new QueryHash(); 
-    q.add('first', 'passed');
-    q.add('second', 'also-passed');
+    q.add('white', 'house');
+    q.add('green', 'car');
 
     it('Should find a value by its key', function () {
-        expect(q.find('first')).to.equal('passed');
+        expect(q.find('white')).to.equal('house');
     });
 
     it('Should throw an expection if 0 parameters are given', function () {
         expect(q.find.bind(q)).to.throw('QueryHash.find expects one parameter, 0 given');
+    });
+});
+
+describe('QueryHash.has method', function () {
+    let q = new QueryHash();
+    q.add('whoa', 'dude');
+    q.add('what', 'bro');
+    q.add('tight', 'huh?');
+
+    it('Should return a boolean indicating whether or not a given key exists', function () {
+        expect(q.has('whoa')).to.equal(true);
+        expect(q.has('nosir')).to.equal(false);
     });
 });
 
@@ -127,6 +141,3 @@ describe('QueryHash.fromUrlToken method', function () {
         expect(q.find('test')).to.equal('passed');
     });
 });
-
-
-

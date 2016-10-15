@@ -39,7 +39,7 @@ class QueryHash {
         if (arguments.length !== 1) {
             throw new Error(`QueryHash.find expects one parameter, ${arguments.length} given.`);
         }
-        if (!this._items.hasOwnProperty(name)) {
+        if (!this.has(name)) {
             throw new Error(`Item "${name}" does not exist in instance of QueryHash`);
         }
 
@@ -48,6 +48,10 @@ class QueryHash {
 
     keys() {
         return Object.keys(this._items);
+    }
+
+    has(key) {
+        return this.keys().indexOf(key);
     }
 
     toUrlToken() {
