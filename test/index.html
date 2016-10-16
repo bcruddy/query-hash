@@ -9,13 +9,21 @@
         <script>
             var q = new QueryHash();
             q.add('test', 'passed');
-	        q.add('another', 'one');
+            q.add('another', 'one');
             console.log(q.toString());
-	        console.log(q.toUrlToken());
+            console.log(q.toUrlToken());
             
             var q2 = new QueryHash();
             q2.fromUrlToken(q.toUrlToken());
             console.log(q2.keys());
+
+            var testObj = {
+                dude: 'sweet',
+                whoa: 'works'
+            };
+            var q3 = new QueryHash();
+            q3.fromObject(testObj);
+            console.log(q3.keys());
         </script>
     </body>
 </html>
