@@ -17,6 +17,7 @@ After constructing your instance of QueryHash, the following methods are availab
 
 * `fromUrlToken(token:string)` - Imports a base64 token to be manipulated/un-tokenized
 * `fromQueryString(queryString:string)` - Imports a query string to be manipulated/tokenized
+* `fromObject(obj:object)` - Imports an object to manipulated/tokenized *NOTE: objects should only have a "depth" of one, complex objects will not be stringified properly*
 * `toUrlToken()` - Returns your querystring as a base64 encoded token
 * `toString()` - Returns a querystring from your added/removed values
 * `add(key:string, value:string|boolean|number)` - Accepts a key and a value

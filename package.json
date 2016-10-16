@@ -1,11 +1,11 @@
 {
   "name": "query-hash",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "hash query strings easily",
   "main": "query-hash.js",
   "repository": "https://github.com/bcruddy/query-hash",
   "scripts": {
-    "test:server": "mocha test/server.js",
+    "test:server": "mocha test/index.js",
     "build:client": "export NODE_ENV=prod && webpack -p --config webpack.config.client.js",
     "watch:client": "export NODE_ENV=dev && webpack --watch --config webpack.config.client.js",
     "build:server": "webpack --config webpack.config.server.js",

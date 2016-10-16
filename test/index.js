@@ -74,7 +74,7 @@ describe('QueryHash.has method', function () {
     let q = new QueryHash();
     q.add('whoa', 'dude');
     q.add('what', 'bro');
-    q.add('tight', 'huh?');
+    q.add('tight', 'huh');
 
     it('Should return a boolean indicating whether or not a given key exists', function () {
         expect(q.has('whoa')).to.equal(true);
@@ -140,4 +140,28 @@ describe('QueryHash.fromUrlToken method', function () {
 
         expect(q.find('test')).to.equal('passed');
     });
+});
+
+describe('QueryHas.fromObject method', function () {
+    let q = new QueryHash();
+
+    let fakeData = {
+        item: 'is',
+        a: 'test object'
+    };
+    
+    it('Should throw an exception when no params passed', function () {
+        expect(q.fromObject.bind(q)).to.throw('QueryHash.fromObject expects one parameter, 0 given');
+    });
+
+    it('Should throw an exception if the argument passed isnt an object', function () {
+        expect(q.fromObject.bind(q, null)).to.throw('QueryHash.fromObject expects an object');
+    });
+
+    it('Should transform fakeData from object to query string', function () {
+        q.fromObject(fakeData);
+
+        expect(q.toString()).to.equal('item=is&a=test%20object');
+    });
+
 });

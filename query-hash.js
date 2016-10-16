@@ -137,7 +137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'has',
 	        value: function has(key) {
-	            return !!this._items[key];
+	            return this.keys().indexOf(key) !== -1;
 	        }
 	    }, {
 	        key: 'toUrlToken',
@@ -187,6 +187,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            this._items = this._fromInput(qs, false);
+
+	            return this;
+	        }
+	    }, {
+	        key: 'fromObject',
+	        value: function fromObject(obj) {
+	            if (arguments.length !== 1) {
+	                throw new Error('QueryHash.fromObject expects one parameter, ' + arguments.length + ' given.');
+	            }
+	            if (Object.prototype.toString.call(obj) !== '[object Object]') {
+	                throw new Error('QueryHash.fromObject expects an object');
+	            }
+
+	            this._items = {};
+	            for (var key in obj) {
+	                this._items[key] = obj[key];
+	            }
 
 	            return this;
 	        }

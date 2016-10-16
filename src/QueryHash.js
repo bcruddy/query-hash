@@ -51,7 +51,7 @@ class QueryHash {
     }
 
     has(key) {
-        return this.keys().indexOf(key);
+        return this.keys().indexOf(key) !== -1;
     }
 
     toUrlToken() {
@@ -101,6 +101,22 @@ class QueryHash {
         } 
 
         this._items = this._fromInput(qs, false);
+
+        return this;
+    }
+
+    fromObject(obj) {
+        if (arguments.length !== 1) {
+            throw new Error(`QueryHash.fromObject expects one parameter, ${arguments.length} given.`);
+        }
+        if (Object.prototype.toString.call(obj) !== '[object Object]') {
+            throw new Error('QueryHash.fromObject expects an object');
+        }
+
+        this._items = {};
+        for (let key in obj) {
+            this._items[key] = obj[key];
+        }
 
         return this;
     }
