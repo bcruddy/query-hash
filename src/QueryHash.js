@@ -6,18 +6,12 @@ class QueryHash {
             this._items = {};
         }
         else if (arguments.length === 1) {
-            if (typeof data === 'string') {
-                if (this._isBase64(data))
-                    this.fromUrlToken(data);
-                else
-                    this.fromQueryString(data);
-            }
-            else if (Object.prototype.toString.call(data) === '[object Object]') {
+            if (typeof data === 'string')
+                this[this._isBase64(data) ? 'fromUrlToken' : 'fromQueryString'](data);
+            else if (Object.prototype.toString.call(data) === '[object Object]')
                 this._items = data;
-            }
-            else {
+            else
                 throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
-            }
         }
         else {
             throw new Error('QueryHash constructor only accepts one optional parameter.');
