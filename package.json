@@ -4,6 +4,7 @@
   "description": "hash query strings easily",
   "main": "query-hash.js",
   "repository": "https://github.com/bcruddy/query-hash",
+  "tonicExampleFilename": "test/tonic-example.js",
   "scripts": {
     "test": "npm run build:server && mocha test/index.js",
     "build:client": "export NODE_ENV=prod && webpack -p --config webpack.config.client.js",
