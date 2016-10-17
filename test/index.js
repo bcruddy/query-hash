@@ -48,7 +48,7 @@ describe('QueryHash Constructor', function () {
     });
 
     it('Throw exception on invalid input', function () {
-        let create = (d) => new QueryHash(d);
+        let create = d => new QueryHash(d);
         expect(create.bind(null, [])).to.throw('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
         expect(create.bind(null, null)).to.throw('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
         expect(create.bind(null, false)).to.throw('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
@@ -183,6 +183,8 @@ describe('QueryHash.fromObject method', function () {
 
     it('Throw an exception if the argument passed isnt an object', function () {
         expect(q.fromObject.bind(q, null)).to.throw('QueryHash.fromObject expects an object');
+        expect(q.fromObject.bind(q, '')).to.throw('QueryHash.fromObject expects an object');
+        expect(q.fromObject.bind(q, false)).to.throw('QueryHash.fromObject expects an object');
     });
 
     it('Transforms fakeData from object to query string', function () {
