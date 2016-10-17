@@ -131,12 +131,12 @@ describe('QueryHash.keys method', function () {
     });
 });
 
-describe('QueryHash.toString method', function () {
+describe('QueryHash.toQueryString method', function () {
     let q = new QueryHash();
     q.add('test', 'passed');
     q.add('again', 'hooray');
 
-    it('Create a query string for instance key-values', function () {
+    it('Create a query string from instance key-values', function () {
         expect(q.toQueryString()).to.equal('test=passed&again=hooray');
     });
 });
