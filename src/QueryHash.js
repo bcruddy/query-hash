@@ -2,15 +2,15 @@
 
 class QueryHash {
     constructor(data) {
-        if (arguments.length == 0)
-            this._items = {};
-        else if (arguments.length > 1)
+        this._items = {};
+
+        if (arguments.length > 1)
             throw new Error('QueryHash constructor only accepts one optional parameter.');
         else if (typeof data === 'string')
             this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);
         else if (Object.prototype.toString.call(data) === '[object Object]')
             this.fromObject(data);
-        else
+        else if (arguments.length !== 0)
             throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
 
         return this;
@@ -68,7 +68,7 @@ class QueryHash {
         if (typeof urlToken !== 'string')
             throw new Error(`QueryHash.fromUrlToken expects input to be of type string. Type ${Object.prototype.toString.call(urlToken)} provided`);
 
-        this._items = this._fromInput(urlToken, true);
+        this._items = this._fromString(urlToken, true);
 
         return this;
     }
@@ -85,7 +85,7 @@ class QueryHash {
         if (typeof qs !== 'string')
             throw new Error(`QueryHash.fromQueryString expects input to be of type string. Type ${Object.prototype.toString.call(qs)} provided`);
 
-        this._items = this._fromInput(qs, false);
+        this._items = this._fromString(qs, false);
 
         return this;
     }
@@ -97,10 +97,9 @@ class QueryHash {
             throw new Error('QueryHash.fromObject expects an object');
 
         this._items = Object.keys(obj)
+            .filter(key => obj[key] !== 'object')
             .reduce((p, key) => {
-                if (typeof obj[key] !== 'object') { 
-                    p[key] = obj[key]; 
-                }
+                p[key] = decodeURIComponent(obj[key] || '').replace(/\+/g, ' ');
 
                 return p;
             }, {});
@@ -108,7 +107,7 @@ class QueryHash {
         return this;
     }
 
-    _fromInput(input, isBase64) {
+    _fromString(input, isBase64) {
         let isLikelyNode = typeof window === 'undefined';
 
         let qs = input;

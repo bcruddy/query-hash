@@ -169,7 +169,7 @@ describe('QueryHash.fromUrlToken method', function () {
     });
 });
 
-describe('QueryHas.fromObject method', function () {
+describe('QueryHash.fromObject method', function () {
     let q = new QueryHash();
 
     let fakeData = {
@@ -185,7 +185,7 @@ describe('QueryHas.fromObject method', function () {
         expect(q.fromObject.bind(q, null)).to.throw('QueryHash.fromObject expects an object');
     });
 
-    it('Transform sfakeData from object to query string', function () {
+    it('Transforms fakeData from object to query string', function () {
         q.fromObject(fakeData);
 
         expect(q.toQueryString()).to.equal('item=is&a=test%20object');

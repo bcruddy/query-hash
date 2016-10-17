@@ -65,8 +65,6 @@ var QueryHash =
 	    value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -75,7 +73,9 @@ var QueryHash =
 	    function QueryHash(data) {
 	        _classCallCheck(this, QueryHash);
 
-	        if (arguments.length == 0) this._items = {};else if (arguments.length > 1) throw new Error('QueryHash constructor only accepts one optional parameter.');else if (typeof data === 'string') this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);else if (Object.prototype.toString.call(data) === '[object Object]') this.fromObject(data);else throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
+	        this._items = {};
+
+	        if (arguments.length > 1) throw new Error('QueryHash constructor only accepts one optional parameter.');else if (typeof data === 'string') this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);else if (Object.prototype.toString.call(data) === '[object Object]') this.fromObject(data);else if (arguments.length !== 0) throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
 
 	        return this;
 	    }
@@ -132,7 +132,7 @@ var QueryHash =
 	            if (arguments.length !== 1) throw new Error('QueryHash.fromUrlToken expects 1 parameter. ' + arguments.length + ' given.');
 	            if (typeof urlToken !== 'string') throw new Error('QueryHash.fromUrlToken expects input to be of type string. Type ' + Object.prototype.toString.call(urlToken) + ' provided');
 
-	            this._items = this._fromInput(urlToken, true);
+	            this._items = this._fromString(urlToken, true);
 
 	            return this;
 	        }
@@ -151,7 +151,7 @@ var QueryHash =
 	            if (arguments.length !== 1) throw new Error('QueryHash.fromQueryString expects 1 parameter. ' + arguments.length + ' given.');
 	            if (typeof qs !== 'string') throw new Error('QueryHash.fromQueryString expects input to be of type string. Type ' + Object.prototype.toString.call(qs) + ' provided');
 
-	            this._items = this._fromInput(qs, false);
+	            this._items = this._fromString(qs, false);
 
 	            return this;
 	        }
@@ -161,10 +161,10 @@ var QueryHash =
 	            if (arguments.length !== 1) throw new Error('QueryHash.fromObject expects one parameter, ' + arguments.length + ' given.');
 	            if (Object.prototype.toString.call(obj) !== '[object Object]') throw new Error('QueryHash.fromObject expects an object');
 
-	            this._items = Object.keys(obj).reduce(function (p, key) {
-	                if (_typeof(obj[key]) !== 'object') {
-	                    p[key] = obj[key];
-	                }
+	            this._items = Object.keys(obj).filter(function (key) {
+	                return obj[key] !== 'object';
+	            }).reduce(function (p, key) {
+	                p[key] = decodeURIComponent(obj[key] || '').replace(/\+/g, ' ');
 
 	                return p;
 	            }, {});
@@ -172,8 +172,8 @@ var QueryHash =
 	            return this;
 	        }
 	    }, {
-	        key: '_fromInput',
-	        value: function _fromInput(input, isBase64) {
+	        key: '_fromString',
+	        value: function _fromString(input, isBase64) {
 	            var isLikelyNode = typeof window === 'undefined';
 
 	            var qs = input;
