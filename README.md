@@ -14,9 +14,10 @@ bower or [npm](https://www.npmjs.com/package/query-hash):
 ## Usage
 
     var q = new QueryHash();
-    q.add('test', 'item');
-    q.add('second', 'widget');
-    q.toQueryString(); // test=item&second=widget
+    q.add('test', 'passed');
+    q.add('again', 'hooray');
+    q.toQueryString(); // test=passed&again=hooray
+    q.toUrlToken(); // dGVzdD1wYXNzZWQmYWdhaW49aG9vcmF5
 
 ## API
 After constructing your instance of QueryHash, the following methods are available:
