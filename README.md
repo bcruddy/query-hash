@@ -20,7 +20,7 @@ bower or [npm](https://www.npmjs.com/package/query-hash):
     q.toUrlToken(); // dGVzdD1wYXNzZWQmYWdhaW49aG9vcmF5
 
 ## API
-After constructing your instance of QueryHash, the following methods are available:
+Full docs avaibable [here](https://bcruddy.github.io/query-hash/)
 
 * `new QueryHash([data:querystring|base64|object])` - Construct it empty or from: a query string, a base64 token, or a plain object.
 * `fromUrlToken(token:string)` - Imports a base64 token to be manipulated/un-tokenized
