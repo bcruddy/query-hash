@@ -70,10 +70,22 @@ var QueryHash =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var QueryHash = function () {
-	    function QueryHash() {
+	    function QueryHash(data) {
 	        _classCallCheck(this, QueryHash);
 
-	        this._items = {};
+	        if (arguments.length == 0) {
+	            this._items = {};
+	        } else if (arguments.length === 1) {
+	            if (typeof data === 'string') {
+	                if (this._isBase64(data)) this.fromUrlToken(data);else this.fromQueryString(data);
+	            } else if (Object.prototype.toString.call(data) === '[object Object]') {
+	                this._items = data;
+	            } else {
+	                throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
+	            }
+	        } else {
+	            throw new Error('QueryHash constructor only accepts one optional parameter.');
+	        }
 
 	        return this;
 	    }
@@ -84,7 +96,6 @@ var QueryHash =
 	            if (arguments.length !== 2) {
 	                throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
 	            }
-
 	            if (this._items.hasOwnProperty(name)) {
 	                throw new Error('Property "' + name + '" already exists in QueryHash instance');
 	            }
@@ -134,24 +145,7 @@ var QueryHash =
 	        key: 'toUrlToken',
 	        value: function toUrlToken() {
 	            var isLikelyNode = typeof window === 'undefined';
-	            if (isLikelyNode) return new Buffer(this.toString()).toString('base64');else return btoa(this.toString());
-	        }
-	    }, {
-	        key: 'toString',
-	        value: function toString() {
-	            var qs = '';
-
-	            for (var key in this._items) {
-	                var val = this._items[key];
-
-	                if (!qs.length) {
-	                    qs += encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
-	                } else {
-	                    qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
-	                }
-	            }
-
-	            return qs;
+	            if (isLikelyNode) return new Buffer(this.toQueryString()).toString('base64');else return btoa(this.toQueryString());
 	        }
 	    }, {
 	        key: 'fromUrlToken',
@@ -166,6 +160,19 @@ var QueryHash =
 	            this._items = this._fromInput(urlToken, true);
 
 	            return this;
+	        }
+	    }, {
+	        key: 'toQueryString',
+	        value: function toQueryString() {
+	            var qs = '';
+
+	            for (var key in this._items) {
+	                var val = this._items[key];
+
+	                if (!qs.length) qs += encodeURIComponent(key) + '=' + encodeURIComponent(val || '');else qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
+	            }
+
+	            return qs;
 	        }
 	    }, {
 	        key: 'fromQueryString',
@@ -216,6 +223,13 @@ var QueryHash =
 	            });
 
 	            return JSON.parse(JSON.stringify(obj));
+	        }
+	    }, {
+	        key: '_isBase64',
+	        value: function _isBase64(maybe64) {
+	            var regex = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
+
+	            return regex.test(maybe64);
 	        }
 	    }]);
 

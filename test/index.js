@@ -4,18 +4,54 @@ const QueryHash = require('../query-hash');
 const expect = require('chai').expect;
 
 describe('QueryHash Constructor', function () {
-    it('Should construct without throwing an exception', function () {
-        let hasError = false;
-        let q;
-        try {
-            q = new QueryHash();
-        }
-        catch (ex) {
-            hasError = true;
-        }
-
-        expect(hasError).to.equal(false);
+    it('Should accept 0 parameters', function () {
+        let q = new QueryHash();
         expect(q).to.be.an.instanceof(QueryHash);
+    });
+
+    it('Should accept querystring parameter', function () {
+        let q = new QueryHash('test=passed&again=too');
+
+        expect(q).to.be.an.instanceof(QueryHash);
+        expect(q.find('test')).to.equal('passed');
+    });
+
+    it('Should accept querystring parameter with a trailing empty value', function () {
+        let q = new QueryHash('test=passed&again=');
+
+        expect(q).to.be.an.instanceof(QueryHash);
+        expect(q.find('test')).to.equal('passed');
+        expect(q.find('again')).to.equal('');
+    });
+
+    it('Should accept base64 string parameter', function () {
+        let q = new QueryHash('dGVzdD1wYXNzZWQ=');
+
+        expect(q).to.be.an.instanceof(QueryHash);
+        expect(q.toQueryString()).to.equal('test=passed');
+    });
+
+    it('Should accept plain object parameter', function () {
+        let data = {
+            test: 'passed',
+            again: 'too'
+        };
+        let q = new QueryHash(data);
+
+        expect(q).to.be.an.instanceof(QueryHash);
+        expect(q.toQueryString()).to.equal('test=passed&again=too');
+    });
+
+    it('Should reject more than 1 parameter', function () {
+        let create = () => new QueryHash('test', 'fails');
+        expect(create.bind(null)).to.throw('QueryHash constructor only accepts one optional parameter.')
+    });
+
+    it('Should reject invalid input', function () {
+        let create = (d) => new QueryHash(d);
+        expect(create.bind(null, [])).to.throw('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
+        expect(create.bind(null, null)).to.throw('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
+        expect(create.bind(null, false)).to.throw('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
     });
 });
 
@@ -98,7 +134,7 @@ describe('QueryHash.toString method', function () {
     q.add('again', 'hooray');
 
     it('Should create a query string from added key-values', function () {
-        expect(q.toString()).to.equal('test=passed&again=hooray');
+        expect(q.toQueryString()).to.equal('test=passed&again=hooray');
     });
 });
 
@@ -113,13 +149,13 @@ describe('QueryHash.fromQueryString method', function () {
     it('Should add a query string parameter', function () {
         q.add('another', 'one');
 
-        expect(q.toString()).to.equal('test=passed&again=hooray&another=one');
+        expect(q.toQueryString()).to.equal('test=passed&again=hooray&another=one');
     });
 
     it('Should remove a query string parameter', function () {
         q.remove('test');
 
-        expect(q.toString()).to.equal('again=hooray&another=one');
+        expect(q.toQueryString()).to.equal('again=hooray&another=one');
     });
 });
 
@@ -161,7 +197,7 @@ describe('QueryHas.fromObject method', function () {
     it('Should transform fakeData from object to query string', function () {
         q.fromObject(fakeData);
 
-        expect(q.toString()).to.equal('item=is&a=test%20object');
+        expect(q.toQueryString()).to.equal('item=is&a=test%20object');
     });
 
 });

@@ -1,8 +1,27 @@
 'use strict';
 
 class QueryHash {
-    constructor() {
-        this._items = {};
+    constructor(data) {
+        if (arguments.length == 0) {
+            this._items = {};
+        }
+        else if (arguments.length === 1) {
+            if (typeof data === 'string') {
+                if (this._isBase64(data))
+                    this.fromUrlToken(data);
+                else
+                    this.fromQueryString(data);
+            }
+            else if (Object.prototype.toString.call(data) === '[object Object]') {
+                this._items = data;
+            }
+            else {
+                throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
+            }
+        }
+        else {
+            throw new Error('QueryHash constructor only accepts one optional parameter.');
+        }
 
         return this;
     }
@@ -11,7 +30,6 @@ class QueryHash {
         if (arguments.length !== 2) {
             throw new Error(`QueryHash.add expects 2 parameters, ${arguments.length} given.`);
         }
-
         if (this._items.hasOwnProperty(name)) {
             throw new Error(`Property "${name}" already exists in QueryHash instance`);
         }
@@ -57,26 +75,9 @@ class QueryHash {
     toUrlToken() {
         let isLikelyNode = typeof window === 'undefined';
         if (isLikelyNode)
-            return new Buffer(this.toString()).toString('base64');
+            return new Buffer(this.toQueryString()).toString('base64');
         else
-            return btoa(this.toString());
-    }
-
-    toString() {
-        let qs = '';
-
-        for (let key in this._items) {
-            let val = this._items[key];
-
-            if (!qs.length) {
-                qs += encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
-            }
-            else {
-                qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
-            }
-        }
-
-        return qs;
+            return btoa(this.toQueryString());
     }
 
     fromUrlToken(urlToken) {
@@ -90,6 +91,21 @@ class QueryHash {
         this._items = this._fromInput(urlToken, true);
 
         return this;
+    }
+
+    toQueryString() {
+        let qs = '';
+
+        for (let key in this._items) {
+            let val = this._items[key];
+
+            if (!qs.length)
+                qs += encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
+            else
+                qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
+        }
+
+        return qs;
     }
 
     fromQueryString(qs) {
@@ -140,6 +156,12 @@ class QueryHash {
         });
 
         return JSON.parse(JSON.stringify(obj));
+    }
+
+    _isBase64(maybe64) {
+        let regex = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
+
+        return regex.test(maybe64);
     }
 }
 
