@@ -6,14 +6,14 @@ let q = new QueryHash();
 q.add('userId', '23412');
 q.add('packageId', '10001');
 q.add('couponCode', 'SWEETEXAMPLE120');
-let token = q.toUrlToken();
-console.log(token);
+console.log(q.toUrlToken());
 
 let q2 = new QueryHash(token);
+console.log(q2.has('packageId'));
 console.log(q2.find('packageId'));
 q2.remove('packageId');
-let query = q2.toQueryString();
-console.log(query);
+console.log(q2.has('packageId'));
+console.log(q2.toQueryString());
 
 let q3 = new QueryHash(query);
 console.log(q3.keys());
