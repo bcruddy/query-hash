@@ -2,7 +2,7 @@
   "name": "query-hash",
   "description": "hash query strings easily",
   "main": "dist/query-hash.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "authors": [
     "@bcruddy"
   ],

@@ -74,6 +74,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -82,13 +84,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function QueryHash(data) {
 	        _classCallCheck(this, QueryHash);
 
-	        if (arguments.length == 0) {
-	            this._items = {};
-	        } else if (arguments.length === 1) {
-	            if (typeof data === 'string') this[this._isBase64(data) ? 'fromUrlToken' : 'fromQueryString'](data);else if (Object.prototype.toString.call(data) === '[object Object]') this._items = data;else throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
-	        } else {
-	            throw new Error('QueryHash constructor only accepts one optional parameter.');
-	        }
+	        if (arguments.length == 0) this._items = {};else if (arguments.length > 1) throw new Error('QueryHash constructor only accepts one optional parameter.');else if (typeof data === 'string') this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);else if (Object.prototype.toString.call(data) === '[object Object]') this.fromObject(data);else throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
 
 	        return this;
 	    }
@@ -96,12 +92,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(QueryHash, [{
 	        key: 'add',
 	        value: function add(name, val) {
-	            if (arguments.length !== 2) {
-	                throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
-	            }
-	            if (this.has(name)) {
-	                throw new Error('Property "' + name + '" already exists in QueryHash instance');
-	            }
+	            if (arguments.length !== 2) throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
+	            if (this.has(name)) throw new Error('Property "' + name + '" already exists in QueryHash instance');
 
 	            this._items[name] = val;
 
@@ -110,13 +102,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'remove',
 	        value: function remove(name) {
-	            if (arguments.length !== 1) {
-	                throw new Error('QueryHash.remove expects one parameter, ' + arguments.length + ' given.');
-	            }
+	            if (arguments.length !== 1) throw new Error('QueryHash.remove expects one parameter, ' + arguments.length + ' given.');
 	            // do we really need to throw an error here? Or just skip the delete statement?
-	            if (!this.has(name)) {
-	                throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
-	            }
+	            if (!this.has(name)) throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
 
 	            delete this._items[name];
 
@@ -125,12 +113,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'find',
 	        value: function find(name) {
-	            if (arguments.length !== 1) {
-	                throw new Error('QueryHash.find expects one parameter, ' + arguments.length + ' given.');
-	            }
-	            if (!this.has(name)) {
-	                throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
-	            }
+	            if (arguments.length !== 1) throw new Error('QueryHash.find expects one parameter, ' + arguments.length + ' given.');
+	            if (!this.has(name)) throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
 
 	            return this._items[name];
 	        }
@@ -148,17 +132,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'toUrlToken',
 	        value: function toUrlToken() {
 	            var isLikelyNode = typeof window === 'undefined';
-	            if (isLikelyNode) return new Buffer(this.toQueryString()).toString('base64');else return btoa(this.toQueryString());
+
+	            return isLikelyNode ? new Buffer(this.toQueryString()).toString('base64') : btoa(this.toQueryString());
 	        }
 	    }, {
 	        key: 'fromUrlToken',
 	        value: function fromUrlToken(urlToken) {
-	            if (arguments.length !== 1) {
-	                throw new Error('QueryHash.fromUrlToken expects 1 parameter. ' + arguments.length + ' given.');
-	            }
-	            if (typeof urlToken !== 'string') {
-	                throw new Error('QueryHash.fromUrlToken expects input to be of type string. Type ' + Object.prototype.toString.call(urlToken) + ' provided');
-	            }
+	            if (arguments.length !== 1) throw new Error('QueryHash.fromUrlToken expects 1 parameter. ' + arguments.length + ' given.');
+	            if (typeof urlToken !== 'string') throw new Error('QueryHash.fromUrlToken expects input to be of type string. Type ' + Object.prototype.toString.call(urlToken) + ' provided');
 
 	            this._items = this._fromInput(urlToken, true);
 
@@ -167,25 +148,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'toQueryString',
 	        value: function toQueryString() {
-	            var qs = '';
+	            var _this = this;
 
-	            for (var key in this._items) {
-	                var val = this._items[key];
-
-	                if (!qs.length) qs += encodeURIComponent(key) + '=' + encodeURIComponent(val || '');else qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(val || '');
-	            }
-
-	            return qs;
+	            return this.keys().map(function (k) {
+	                return encodeURIComponent(k) + '=' + encodeURIComponent(_this.find(k) || '');
+	            }).join('&');
 	        }
 	    }, {
 	        key: 'fromQueryString',
 	        value: function fromQueryString(qs) {
-	            if (arguments.length !== 1) {
-	                throw new Error('QueryHash.fromQueryString expects 1 parameter. ' + arguments.length + ' given.');
-	            }
-	            if (typeof qs !== 'string') {
-	                throw new Error('QueryHash.fromQueryString expects input to be of type string. Type ' + Object.prototype.toString.call(qs) + ' provided');
-	            }
+	            if (arguments.length !== 1) throw new Error('QueryHash.fromQueryString expects 1 parameter. ' + arguments.length + ' given.');
+	            if (typeof qs !== 'string') throw new Error('QueryHash.fromQueryString expects input to be of type string. Type ' + Object.prototype.toString.call(qs) + ' provided');
 
 	            this._items = this._fromInput(qs, false);
 
@@ -194,17 +167,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'fromObject',
 	        value: function fromObject(obj) {
-	            if (arguments.length !== 1) {
-	                throw new Error('QueryHash.fromObject expects one parameter, ' + arguments.length + ' given.');
-	            }
-	            if (Object.prototype.toString.call(obj) !== '[object Object]') {
-	                throw new Error('QueryHash.fromObject expects an object');
-	            }
+	            if (arguments.length !== 1) throw new Error('QueryHash.fromObject expects one parameter, ' + arguments.length + ' given.');
+	            if (Object.prototype.toString.call(obj) !== '[object Object]') throw new Error('QueryHash.fromObject expects an object');
 
-	            this._items = {};
-	            for (var key in obj) {
-	                this._items[key] = obj[key];
-	            }
+	            this._items = Object.keys(obj).reduce(function (p, key) {
+	                if (_typeof(obj[key]) !== 'object') {
+	                    p[key] = obj[key];
+	                }
+
+	                return p;
+	            }, {});
 
 	            return this;
 	        }
@@ -212,20 +184,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: '_fromInput',
 	        value: function _fromInput(input, isBase64) {
 	            var isLikelyNode = typeof window === 'undefined';
-	            var qs = void 0;
-	            if (isLikelyNode) qs = isBase64 ? new Buffer(input, 'base64').toString() : input;else qs = isBase64 ? atob(input) : input;
+
+	            var qs = input;
+	            if (isBase64) qs = isLikelyNode ? new Buffer(input, 'base64').toString() : atob(input);
 
 	            if (qs.indexOf('?') === 0) {
 	                qs = qs.slice(1);
 	            }
 
-	            var obj = {};
-	            qs.split('&').forEach(function (kv) {
-	                kv = kv.split('=');
-	                obj[kv[0]] = decodeURIComponent(kv[1] || '').replace(/\+/g, ' ');
-	            });
+	            return qs.split('&').map(function (kv) {
+	                return kv.split('=');
+	            }).reduce(function (p, kv) {
+	                p[kv[0]] = decodeURIComponent(kv[1] || '').replace(/\+/g, ' ');
 
-	            return JSON.parse(JSON.stringify(obj));
+	                return p;
+	            }, {});
 	        }
 	    }, {
 	        key: '_isBase64',
