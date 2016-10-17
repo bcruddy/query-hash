@@ -79,6 +79,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var QueryHash = function () {
+
+	    /**
+	     * Create an instance of QueryHash
+	     * @Constructor
+	     * @param {string|object} [data] - base to create key-value items; base64 string, query string, or plain object
+	     * @throws Error
+	     * @returns {QueryHash} this, chainable
+	     * @public
+	     */
 	    function QueryHash(data) {
 	        _classCallCheck(this, QueryHash);
 
@@ -89,45 +98,95 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this;
 	    }
 
+	    /**
+	     * Add a key-value pair
+	     * @param {string} key - item key to add
+	     * @param {string|number|boolean} val - item value
+	     * @throws Error
+	     * @returns {QueryHash} this, chainable
+	     * @public
+	     */
+
+
 	    _createClass(QueryHash, [{
 	        key: 'add',
-	        value: function add(name, val) {
+	        value: function add(key, val) {
 	            if (arguments.length !== 2) throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
-	            if (this.has(name)) throw new Error('Property "' + name + '" already exists in QueryHash instance');
+	            if (this.has(key)) throw new Error('Property "' + key + '" already exists in QueryHash instance');
 
-	            this._items[name] = val;
+	            this._items[key] = val;
 
 	            return this;
 	        }
+
+	        /**
+	         * Remove an item by it's key
+	         * @param {string} key - item key to remove
+	         * @throws Error
+	         * @returns {QueryHash} this, chainable
+	         * @public
+	         */
+
 	    }, {
 	        key: 'remove',
-	        value: function remove(name) {
+	        value: function remove(key) {
 	            if (arguments.length !== 1) throw new Error('QueryHash.remove expects one parameter, ' + arguments.length + ' given.');
 	            // do we really need to throw an error here? Or just skip the delete statement?
-	            if (!this.has(name)) throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
+	            if (!this.has(key)) throw new Error('Item "' + key + '" does not exist in instance of QueryHash');
 
-	            delete this._items[name];
+	            delete this._items[key];
 
 	            return this;
 	        }
+
+	        /**
+	         * Find an item by its key
+	         * @param {string} key - item key to find
+	         * @throws Error
+	         * @returns {boolean}
+	         * @public
+	         */
+
 	    }, {
 	        key: 'find',
-	        value: function find(name) {
+	        value: function find(key) {
 	            if (arguments.length !== 1) throw new Error('QueryHash.find expects one parameter, ' + arguments.length + ' given.');
-	            if (!this.has(name)) throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
+	            if (!this.has(key)) throw new Error('Item "' + key + '" does not exist in instance of QueryHash');
 
-	            return this._items[name];
+	            return this._items[key];
 	        }
+
+	        /**
+	         * Return an array of the instance keys
+	         * @returns {Array}
+	         * @public
+	         */
+
 	    }, {
 	        key: 'keys',
 	        value: function keys() {
 	            return Object.keys(this._items);
 	        }
+
+	        /**
+	         * Test whether or not an item exists by its key
+	         * @param {string} key - item key to test
+	         * @returns {boolean}
+	         * @public
+	         */
+
 	    }, {
 	        key: 'has',
 	        value: function has(key) {
 	            return this._items.hasOwnProperty(key);
 	        }
+
+	        /**
+	         * Return a base64 encoded query string
+	         * @returns {string}
+	         * @public
+	         */
+
 	    }, {
 	        key: 'toUrlToken',
 	        value: function toUrlToken() {
@@ -135,6 +194,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return isLikelyNode ? new Buffer(this.toQueryString()).toString('base64') : btoa(this.toQueryString());
 	        }
+
+	        /**
+	         * Add items to instance from base64 query string
+	         * @param {string} urlToken - a base64 encoded query string
+	         * @throws Error
+	         * @returns {QueryHash} this, chainable
+	         * @public
+	         */
+
 	    }, {
 	        key: 'fromUrlToken',
 	        value: function fromUrlToken(urlToken) {
@@ -145,6 +213,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return this;
 	        }
+
+	        /**
+	         * Return a valid query string composed of instance items
+	         * @returns {string}
+	         * @public
+	         */
+
 	    }, {
 	        key: 'toQueryString',
 	        value: function toQueryString() {
@@ -154,6 +229,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return encodeURIComponent(k) + '=' + encodeURIComponent(_this.find(k) || '');
 	            }).join('&');
 	        }
+
+	        /**
+	         * Add items to instance from a query string
+	         * @param {string} qs - a valid query string
+	         * @throws Error
+	         * @returns {QueryHash} this, chainable
+	         * @public
+	         */
+
 	    }, {
 	        key: 'fromQueryString',
 	        value: function fromQueryString(qs) {
@@ -164,6 +248,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return this;
 	        }
+
+	        /**
+	         * Add items to instance, only keys with primitive values will be added
+	         * @param {object} obj - A plain object with no nested/reference values
+	         * @throws Error
+	         * @returns {QueryHash} this, chainable
+	         * @public
+	         */
+
 	    }, {
 	        key: 'fromObject',
 	        value: function fromObject(obj) {
@@ -180,6 +273,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return this;
 	        }
+
+	        /**
+	         * Translate string input to an object
+	         * @param {string} input
+	         * @param {boolean} isBase64
+	         * @returns {object}
+	         * @private
+	         */
+
 	    }, {
 	        key: '_fromString',
 	        value: function _fromString(input, isBase64) {
@@ -200,9 +302,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return p;
 	            }, {});
 	        }
+
+	        /**
+	         * Test whether or not input is a base64 string
+	         * @param {string} maybe64
+	         * @returns {boolean}
+	         * @private
+	         */
+
 	    }, {
 	        key: '_isBase64',
 	        value: function _isBase64(maybe64) {
+	            if (typeof maybe64 !== 'string') {
+	                return false;
+	            }
+	            //noinspection JSCheckFunctionSignatures
 	            var regex = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
 
 	            return regex.test(maybe64);

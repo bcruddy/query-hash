@@ -1,9 +1,14 @@
 # query-hash
-A simple isomorphic library for handling querystrings, tokens, and translating between the two.
+QueryHash is a simple class for handling/creating query strings and base64 query string tokens in the client or browser
+
+* LICENSE: [MIT](https://github.com/bcruddy/query-hash/blob/master/LICENSE)
+* VERSION: 1.2.0
 
 node UMD module lives at `./query-string.js` while the client side lib is exposed as the global `QueryHash` in the `dist` directory.
 
 ## Install
+bower or [npm](https://www.npmjs.com/package/query-hash):
+
 `bower install --save query-hash` or `npm install --save query-hash`
 
 ## Usage
