@@ -3,6 +3,7 @@ QueryHash is a simple class for handling/creating query strings and base64 query
 
 * LICENSE: [MIT](https://github.com/bcruddy/query-hash/blob/master/LICENSE)
 * VERSION: 1.2.0
+* Repository: [https://github.com/bcruddy/query-hash](https://github.com/bcruddy/query-hash)
 
 node UMD module lives at `./query-string.js` while the client side lib is exposed as the global `QueryHash` in the `dist` directory.
 
