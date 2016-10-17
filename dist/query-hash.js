@@ -96,7 +96,7 @@ var QueryHash =
 	            if (arguments.length !== 2) {
 	                throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
 	            }
-	            if (this._items.hasOwnProperty(name)) {
+	            if (this.has(name)) {
 	                throw new Error('Property "' + name + '" already exists in QueryHash instance');
 	            }
 
@@ -111,7 +111,7 @@ var QueryHash =
 	                throw new Error('QueryHash.remove expects one parameter, ' + arguments.length + ' given.');
 	            }
 	            // do we really need to throw an error here? Or just skip the delete statement?
-	            if (!this._items.hasOwnProperty(name)) {
+	            if (!this.has(name)) {
 	                throw new Error('Item "' + name + '" does not exist in instance of QueryHash');
 	            }
 
@@ -139,7 +139,7 @@ var QueryHash =
 	    }, {
 	        key: 'has',
 	        value: function has(key) {
-	            return this.keys().indexOf(key) !== -1;
+	            return this._items.hasOwnProperty(key);
 	        }
 	    }, {
 	        key: 'toUrlToken',
