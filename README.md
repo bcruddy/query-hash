@@ -2,7 +2,7 @@
 QueryHash is a simple class for handling/creating query strings and base64 query string tokens in the client or browser
 
 * LICENSE: [MIT](https://github.com/bcruddy/query-hash/blob/master/LICENSE)
-* VERSION: 1.2.2
+* VERSION: 1.3.1
 * Repository: [https://github.com/bcruddy/query-hash](https://github.com/bcruddy/query-hash)
 * Documentation: [Github pages](https://bcruddy.github.io/query-hash/)
 
