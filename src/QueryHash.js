@@ -104,7 +104,7 @@ class QueryHash {
      * @returns {string}
      */
     toUrlToken() {
-        return new Buffer(this.toQueryString()).toString('base64')
+        return Buffer.from(this.toQueryString()).toString('base64');
     }
 
     /**
@@ -188,7 +188,7 @@ class QueryHash {
     _fromString(input, isBase64) {
         let qs = input;
         if (isBase64)
-            qs = new Buffer(input, 'base64').toString();
+            qs = Buffer.from(input, 'base64').toString();
 
         if (qs.indexOf('?') === 0) {
             qs = qs.slice(1);
