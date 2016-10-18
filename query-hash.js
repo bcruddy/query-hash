@@ -190,7 +190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'toUrlToken',
 	        value: function toUrlToken() {
-	            return new Buffer(this.toQueryString()).toString('base64');
+	            return Buffer.from(this.toQueryString()).toString('base64');
 	        }
 
 	        /**
@@ -284,7 +284,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: '_fromString',
 	        value: function _fromString(input, isBase64) {
 	            var qs = input;
-	            if (isBase64) qs = new Buffer(input, 'base64').toString();
+	            if (isBase64) qs = Buffer.from(input, 'base64').toString();
 
 	            if (qs.indexOf('?') === 0) {
 	                qs = qs.slice(1);
