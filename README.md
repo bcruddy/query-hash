@@ -2,7 +2,7 @@
 QueryHash is a simple class for handling/creating query strings and base64 query string tokens in the client or browser
 
 * LICENSE: [MIT](https://github.com/bcruddy/query-hash/blob/master/LICENSE)
-* VERSION: 1.2.0
+* VERSION: 1.2.2
 * Repository: [https://github.com/bcruddy/query-hash](https://github.com/bcruddy/query-hash)
 * Documentation: [Github pages](https://bcruddy.github.io/query-hash/)
 
@@ -20,6 +20,12 @@ bower or [npm](https://www.npmjs.com/package/query-hash):
     q.add('again', 'hooray');
     q.toQueryString(); // test=passed&again=hooray
     q.toUrlToken(); // dGVzdD1wYXNzZWQmYWdhaW49aG9vcmF5
+
+    var q2 = new QueryHash('dGVzdD1wYXNzZWQmYWdhaW49aG9vcmF5');
+    q2.keys(); // ['test', 'again'];
+    q2.remove('test);
+    q2.add('random', 'value');
+    q2.toQueryString(); // again=hooray&random=value
 
 ## API
 Full docs avaibable [here](https://bcruddy.github.io/query-hash/)

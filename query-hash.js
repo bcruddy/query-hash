@@ -83,10 +83,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Create an instance of QueryHash
 	     * @Constructor
+	     * @public
 	     * @param {string|object} [data] - base to create key-value items; base64 string, query string, or plain object
 	     * @throws Error
 	     * @returns {QueryHash} this, chainable
-	     * @public
 	     */
 	    function QueryHash(data) {
 	        _classCallCheck(this, QueryHash);
@@ -100,11 +100,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Add a key-value pair
+	     * @public
 	     * @param {string} key - item key to add
 	     * @param {string|number|boolean} val - item value
 	     * @throws Error
 	     * @returns {QueryHash} this, chainable
-	     * @public
 	     */
 
 
@@ -121,10 +121,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Remove an item by it's key
+	         * @public
 	         * @param {string} key - item key to remove
 	         * @throws Error
 	         * @returns {QueryHash} this, chainable
-	         * @public
 	         */
 
 	    }, {
@@ -141,10 +141,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Find an item by its key
+	         * @public
 	         * @param {string} key - item key to find
 	         * @throws Error
 	         * @returns {boolean}
-	         * @public
 	         */
 
 	    }, {
@@ -158,8 +158,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Return an array of the instance keys
-	         * @returns {Array}
 	         * @public
+	         * @returns {Array}
 	         */
 
 	    }, {
@@ -170,9 +170,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Test whether or not an item exists by its key
+	         * @public
 	         * @param {string} key - item key to test
 	         * @returns {boolean}
-	         * @public
 	         */
 
 	    }, {
@@ -183,24 +183,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Return a base64 encoded query string
-	         * @returns {string}
 	         * @public
+	         * @returns {string}
 	         */
 
 	    }, {
 	        key: 'toUrlToken',
 	        value: function toUrlToken() {
-	            var isLikelyNode = typeof window === 'undefined';
-
-	            return isLikelyNode ? new Buffer(this.toQueryString()).toString('base64') : btoa(this.toQueryString());
+	            return new Buffer(this.toQueryString()).toString('base64');
 	        }
 
 	        /**
 	         * Add items to instance from base64 query string
+	         * @public
 	         * @param {string} urlToken - a base64 encoded query string
 	         * @throws Error
 	         * @returns {QueryHash} this, chainable
-	         * @public
 	         */
 
 	    }, {
@@ -216,8 +214,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Return a valid query string composed of instance items
-	         * @returns {string}
 	         * @public
+	         * @returns {string}
 	         */
 
 	    }, {
@@ -232,10 +230,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Add items to instance from a query string
+	         * @public
 	         * @param {string} qs - a valid query string
 	         * @throws Error
 	         * @returns {QueryHash} this, chainable
-	         * @public
 	         */
 
 	    }, {
@@ -251,10 +249,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Add items to instance, only keys with primitive values will be added
+	         * @public
 	         * @param {object} obj - A plain object with no nested/reference values
 	         * @throws Error
 	         * @returns {QueryHash} this, chainable
-	         * @public
 	         */
 
 	    }, {
@@ -276,19 +274,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Translate string input to an object
+	         * @private
 	         * @param {string} input
 	         * @param {boolean} isBase64
 	         * @returns {object}
-	         * @private
 	         */
 
 	    }, {
 	        key: '_fromString',
 	        value: function _fromString(input, isBase64) {
-	            var isLikelyNode = typeof window === 'undefined';
-
 	            var qs = input;
-	            if (isBase64) qs = isLikelyNode ? new Buffer(input, 'base64').toString() : atob(input);
+	            if (isBase64) qs = new Buffer(input, 'base64').toString();
 
 	            if (qs.indexOf('?') === 0) {
 	                qs = qs.slice(1);
@@ -305,9 +301,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Test whether or not input is a base64 string
+	         * @private
 	         * @param {string} maybe64
 	         * @returns {boolean}
-	         * @private
 	         */
 
 	    }, {
