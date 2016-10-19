@@ -2,11 +2,12 @@
 QueryHash is a simple class for handling/creating query strings and base64 query string tokens in the client or browser
 
 * LICENSE: [MIT](https://github.com/bcruddy/query-hash/blob/master/LICENSE)
-* VERSION: 1.3.1
+* VERSION: 1.4.0
 * Repository: [https://github.com/bcruddy/query-hash](https://github.com/bcruddy/query-hash)
 * Documentation: [Github pages](https://bcruddy.github.io/query-hash/)
 
 node UMD module lives at `./query-hash.js` while the client side lib is exposed as the global `QueryHash` in the `dist` directory.
+Typescript typing located in `./query-hash.d.ts`
 
 ## Install
 bower or [npm](https://www.npmjs.com/package/query-hash):
@@ -31,9 +32,9 @@ bower or [npm](https://www.npmjs.com/package/query-hash):
 * Handle multiple parameters with the same key (e.g. example.com?foo=bar&foo=baz is a valid query string)
 
 ## API
-Full docs avaibable [here](https://bcruddy.github.io/query-hash/)
+Full docs available [here](https://bcruddy.github.io/query-hash/)
 
-* `new QueryHash([data:querystring|base64|object])` - Construct it empty or from: a query string, a base64 token, or a plain object.
+* `new QueryHash([data:string|object])` - Construct it empty or from: a query string, a base64 token, or a plain object.
 * `fromUrlToken(token:string)` - Imports a base64 token to be manipulated/un-tokenized
 * `fromQueryString(queryString:string)` - Imports a query string to be manipulated/tokenized
 * `fromObject(obj:object)` - Imports an object to manipulated/tokenized *NOTE: objects should only have a "depth" of one, complex objects will not be stringified properly*
