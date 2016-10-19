@@ -27,6 +27,9 @@ bower or [npm](https://www.npmjs.com/package/query-hash):
     q2.add('random', 'value');
     q2.toQueryString(); // again=hooray&random=value
 
+## TODO
+* Handle multiple parameters with the same key (e.g. example.com?foo=bar&foo=baz is a valid query string)
+
 ## API
 Full docs avaibable [here](https://bcruddy.github.io/query-hash/)
 
