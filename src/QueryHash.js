@@ -168,7 +168,7 @@ class QueryHash {
             throw new Error('QueryHash.fromObject expects an object');
 
         this._items = Object.keys(obj)
-            .filter(key => obj[key] !== 'object')
+            .filter(key => typeof obj[key] !== 'object')
             .reduce((p, key) => {
                 p[key] = decodeURIComponent(obj[key] || '').replace(/\+/g, ' ');
 
