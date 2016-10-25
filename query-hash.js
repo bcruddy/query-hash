@@ -74,6 +74,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -91,7 +93,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function QueryHash(data) {
 	        _classCallCheck(this, QueryHash);
 
-	        this._items = {};
+	        this._items = [];
 
 	        if (arguments.length > 1) throw new Error('QueryHash constructor only accepts one optional parameter.');else if (typeof data === 'string') this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);else if (Object.prototype.toString.call(data) === '[object Object]') this.fromObject(data);else if (arguments.length !== 0) throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
 
@@ -112,9 +114,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'add',
 	        value: function add(key, val) {
 	            if (arguments.length !== 2) throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
-	            if (this.has(key)) throw new Error('Property "' + key + '" already exists in QueryHash instance');
 
-	            this._items[key] = val;
+	            this._items.push(new QueryHashItem(key, val));
 
 	            return this;
 	        }
@@ -134,7 +135,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // do we really need to throw an error here? Or just skip the delete statement?
 	            if (!this.has(key)) throw new Error('Item "' + key + '" does not exist in instance of QueryHash');
 
-	            delete this._items[key];
+	            this._items = this._items.filter(function (item) {
+	                return item.key !== key;
+	            });
 
 	            return this;
 	        }
@@ -144,7 +147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @public
 	         * @param {string} key - item key to find
 	         * @throws Error
-	         * @returns {boolean}
+	         * @returns {QueryHashItem[]}
 	         */
 
 	    }, {
@@ -153,7 +156,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (arguments.length !== 1) throw new Error('QueryHash.find expects one parameter, ' + arguments.length + ' given.');
 	            if (!this.has(key)) throw new Error('Item "' + key + '" does not exist in instance of QueryHash');
 
-	            return this._items[key];
+	            return this._items.filter(function (item) {
+	                return item.key === key;
+	            });
 	        }
 
 	        /**
@@ -165,7 +170,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'keys',
 	        value: function keys() {
-	            return Object.keys(this._items);
+	            function uniq(a) {
+	                var seen = {};
+	                return a.filter(function (item) {
+	                    return seen.hasOwnProperty(item) ? false : seen[item] = true;
+	                });
+	            }
+
+	            var seen = {};
+
+	            return this._items.map(function (item) {
+	                return item.key;
+	            }).filter(function (item) {
+	                return seen.hasOwnProperty(item) ? false : seen[item] = true;
+	            });
 	        }
 
 	        /**
@@ -178,7 +196,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'has',
 	        value: function has(key) {
-	            return this._items.hasOwnProperty(key);
+	            return this._items.filter(function (item) {
+	                return item.key === key;
+	            }).length > 0;
 	        }
 
 	        /**
@@ -221,10 +241,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'toQueryString',
 	        value: function toQueryString() {
-	            var _this = this;
-
-	            return this.keys().map(function (k) {
-	                return encodeURIComponent(k) + '=' + encodeURIComponent(_this.find(k) || '');
+	            return this._items.map(function (item) {
+	                return item.toString();
 	            }).join('&');
 	        }
 
@@ -262,12 +280,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (Object.prototype.toString.call(obj) !== '[object Object]') throw new Error('QueryHash.fromObject expects an object');
 
 	            this._items = Object.keys(obj).filter(function (key) {
-	                return obj[key] !== 'object';
-	            }).reduce(function (p, key) {
-	                p[key] = decodeURIComponent(obj[key] || '').replace(/\+/g, ' ');
-
-	                return p;
-	            }, {});
+	                return _typeof(obj[key]) !== 'object';
+	            }).map(function (key) {
+	                return new QueryHashItem(key, obj[key]);
+	            });
 
 	            return this;
 	        }
@@ -277,7 +293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @private
 	         * @param {string} input
 	         * @param {boolean} isBase64
-	         * @returns {object}
+	         * @returns {QueryHashItem[]}
 	         */
 
 	    }, {
@@ -291,12 +307,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            return qs.split('&').map(function (kv) {
-	                return kv.split('=');
-	            }).reduce(function (p, kv) {
-	                p[kv[0]] = decodeURIComponent(kv[1] || '').replace(/\+/g, ' ');
-
-	                return p;
-	            }, {});
+	                var p = kv.split('=');
+	                return new QueryHashItem(p[0], p[1]);
+	            });
 	        }
 
 	        /**
@@ -323,6 +336,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = QueryHash;
+
+	var QueryHashItem = function () {
+	    function QueryHashItem(key, value) {
+	        _classCallCheck(this, QueryHashItem);
+
+	        this.key = key;
+	        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
+	        this.id = Date.now();
+
+	        return this;
+	    }
+
+	    _createClass(QueryHashItem, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return this.key + '=' + encodeURIComponent(this.value);
+	        }
+	    }]);
+
+	    return QueryHashItem;
+	}();
+
+	exports.QueryHashItem = QueryHashItem;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).Buffer))
 
 /***/ },

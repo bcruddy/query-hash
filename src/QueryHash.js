@@ -11,7 +11,7 @@ class QueryHash {
      * @returns {QueryHash} this, chainable
      */
     constructor(data) {
-        this._items = {};
+        this._items = [];
 
         if (arguments.length > 1)
             throw new Error('QueryHash constructor only accepts one optional parameter.');
@@ -36,10 +36,8 @@ class QueryHash {
     add(key, val) {
         if (arguments.length !== 2)
             throw new Error(`QueryHash.add expects 2 parameters, ${arguments.length} given.`);
-        if (this.has(key))
-            throw new Error(`Property "${key}" already exists in QueryHash instance`);
 
-        this._items[key] = val;
+        this._items.push(new QueryHashItem(key, val));
 
         return this;
     }
@@ -58,7 +56,7 @@ class QueryHash {
         if (!this.has(key))
             throw new Error(`Item "${key}" does not exist in instance of QueryHash`);
 
-        delete this._items[key];
+        this._items = this._items.filter(item => item.key !== key);
 
         return this;
     }
@@ -68,7 +66,7 @@ class QueryHash {
      * @public
      * @param {string} key - item key to find
      * @throws Error
-     * @returns {boolean}
+     * @returns {QueryHashItem[]}
      */
     find(key) {
         if (arguments.length !== 1)
@@ -76,7 +74,7 @@ class QueryHash {
         if (!this.has(key))
             throw new Error(`Item "${key}" does not exist in instance of QueryHash`);
 
-        return this._items[key];
+        return this._items.filter(item => item.key === key);
     }
 
     /**
@@ -85,7 +83,18 @@ class QueryHash {
      * @returns {Array}
      */
     keys() {
-        return Object.keys(this._items);
+        function uniq(a) {
+            var seen = {};
+            return a.filter(function(item) {
+                return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+            });
+        }
+
+        let seen = {};
+
+        return this._items
+            .map(item => item.key)
+            .filter(item => seen.hasOwnProperty(item) ? false : (seen[item] = true));
     }
 
     /**
@@ -95,7 +104,7 @@ class QueryHash {
      * @returns {boolean}
      */
     has(key) {
-        return this._items.hasOwnProperty(key);
+        return this._items.filter(item => item.key === key).length > 0;
     }
 
     /**
@@ -131,9 +140,7 @@ class QueryHash {
      * @returns {string}
      */
     toQueryString() {
-        return this.keys()
-            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(this.find(k) || ''))
-            .join('&');
+        return this._items.map(item => item.toString()).join('&');
     }
 
     /**
@@ -168,12 +175,8 @@ class QueryHash {
             throw new Error('QueryHash.fromObject expects an object');
 
         this._items = Object.keys(obj)
-            .filter(key => obj[key] !== 'object')
-            .reduce((p, key) => {
-                p[key] = decodeURIComponent(obj[key] || '').replace(/\+/g, ' ');
-
-                return p;
-            }, {});
+            .filter(key => typeof obj[key] !== 'object')
+            .map(key => new QueryHashItem(key, obj[key]));
 
         return this;
     }
@@ -183,7 +186,7 @@ class QueryHash {
      * @private
      * @param {string} input
      * @param {boolean} isBase64
-     * @returns {object}
+     * @returns {QueryHashItem[]}
      */
     _fromString(input, isBase64) {
         let qs = input;
@@ -195,12 +198,10 @@ class QueryHash {
         }
 
         return qs.split('&')
-            .map(kv => kv.split('='))
-            .reduce((p, kv) => {
-                p[kv[0]] = decodeURIComponent(kv[1] || '').replace(/\+/g, ' ');
-
-                return p;
-            }, {});
+                .map(kv => {
+                    let p = kv.split('=');
+                    return new QueryHashItem(p[0], p[1])
+                });
     }
 
     /**
@@ -221,3 +222,22 @@ class QueryHash {
 }
 
 export default QueryHash;
+
+class QueryHashItem {
+
+    constructor(key, value) {
+        this.key = key;
+        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
+        this.id = Date.now();
+
+        return this;
+    }
+
+    toString() {
+        return `${this.key}=${encodeURIComponent(this.value)}`;
+    }
+}
+
+export { QueryHashItem };
+
+
