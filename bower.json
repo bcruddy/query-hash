@@ -1,13 +1,14 @@
 {
   "name": "query-hash",
-  "description": "hash query strings easily",
+  "description": "QueryHash is a simple class for handling/creating query strings and base64 query string tokens",
   "main": "dist/query-hash.js",
+  "version": "1.4.0",
   "authors": [
     "@bcruddy"
   ],
   "license": "MIT",
   "homepage": "https://github.com/bcruddy/query-hash",
-  "moduleType": [],
+  "moduleType": ["globals"],
   "ignore": [
     "**/.*",
     "node_modules",
