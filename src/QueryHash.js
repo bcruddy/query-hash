@@ -1,5 +1,7 @@
 'use strict';
 
+import QueryHashItem from './QueryHashItem';
+
 class QueryHash {
 
     /**
@@ -83,15 +85,7 @@ class QueryHash {
      * @returns {Array}
      */
     keys() {
-        function uniq(a) {
-            var seen = {};
-            return a.filter(function(item) {
-                return seen.hasOwnProperty(item) ? false : (seen[item] = true);
-            });
-        }
-
         let seen = {};
-
         return this._items
             .map(item => item.key)
             .filter(item => seen.hasOwnProperty(item) ? false : (seen[item] = true));
@@ -222,22 +216,3 @@ class QueryHash {
 }
 
 export default QueryHash;
-
-class QueryHashItem {
-
-    constructor(key, value) {
-        this.key = key;
-        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
-        this.id = Date.now();
-
-        return this;
-    }
-
-    toString() {
-        return `${this.key}=${encodeURIComponent(this.value)}`;
-    }
-}
-
-export { QueryHashItem };
-
-

@@ -78,6 +78,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+	var _QueryHashItem = __webpack_require__(6);
+
+	var _QueryHashItem2 = _interopRequireDefault(_QueryHashItem);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var QueryHash = function () {
@@ -115,7 +121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function add(key, val) {
 	            if (arguments.length !== 2) throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
 
-	            this._items.push(new QueryHashItem(key, val));
+	            this._items.push(new _QueryHashItem2.default(key, val));
 
 	            return this;
 	        }
@@ -170,15 +176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'keys',
 	        value: function keys() {
-	            function uniq(a) {
-	                var seen = {};
-	                return a.filter(function (item) {
-	                    return seen.hasOwnProperty(item) ? false : seen[item] = true;
-	                });
-	            }
-
 	            var seen = {};
-
 	            return this._items.map(function (item) {
 	                return item.key;
 	            }).filter(function (item) {
@@ -282,7 +280,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._items = Object.keys(obj).filter(function (key) {
 	                return _typeof(obj[key]) !== 'object';
 	            }).map(function (key) {
-	                return new QueryHashItem(key, obj[key]);
+	                return new _QueryHashItem2.default(key, obj[key]);
 	            });
 
 	            return this;
@@ -308,7 +306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return qs.split('&').map(function (kv) {
 	                var p = kv.split('=');
-	                return new QueryHashItem(p[0], p[1]);
+	                return new _QueryHashItem2.default(p[0], p[1]);
 	            });
 	        }
 
@@ -336,29 +334,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = QueryHash;
-
-	var QueryHashItem = function () {
-	    function QueryHashItem(key, value) {
-	        _classCallCheck(this, QueryHashItem);
-
-	        this.key = key;
-	        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
-	        this.id = Date.now();
-
-	        return this;
-	    }
-
-	    _createClass(QueryHashItem, [{
-	        key: 'toString',
-	        value: function toString() {
-	            return this.key + '=' + encodeURIComponent(this.value);
-	        }
-	    }]);
-
-	    return QueryHashItem;
-	}();
-
-	exports.QueryHashItem = QueryHashItem;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).Buffer))
 
 /***/ },
@@ -2377,6 +2352,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return toString.call(arr) == '[object Array]';
 	};
 
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var QueryHashItem = function () {
+
+	    /**
+	     * A simple object with a unique id to keep track of key-value pairs
+	     * @param key
+	     * @param value
+	     * @returns {QueryHashItem}
+	     */
+	    function QueryHashItem(key, value) {
+	        _classCallCheck(this, QueryHashItem);
+
+	        this.key = key;
+	        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
+	        this.id = Date.now();
+
+	        return this;
+	    }
+
+	    /**
+	     * get a query string representation of the key-value data
+	     * @returns {string}
+	     */
+
+
+	    _createClass(QueryHashItem, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return this.key + '=' + encodeURIComponent(this.value);
+	        }
+	    }]);
+
+	    return QueryHashItem;
+	}();
+
+	exports.default = QueryHashItem;
 
 /***/ }
 /******/ ])

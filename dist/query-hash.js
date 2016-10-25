@@ -65,7 +65,15 @@ var QueryHash =
 	    value: true
 	});
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _QueryHashItem = __webpack_require__(6);
+
+	var _QueryHashItem2 = _interopRequireDefault(_QueryHashItem);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -82,7 +90,7 @@ var QueryHash =
 	    function QueryHash(data) {
 	        _classCallCheck(this, QueryHash);
 
-	        this._items = {};
+	        this._items = [];
 
 	        if (arguments.length > 1) throw new Error('QueryHash constructor only accepts one optional parameter.');else if (typeof data === 'string') this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);else if (Object.prototype.toString.call(data) === '[object Object]') this.fromObject(data);else if (arguments.length !== 0) throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
 
@@ -103,9 +111,8 @@ var QueryHash =
 	        key: 'add',
 	        value: function add(key, val) {
 	            if (arguments.length !== 2) throw new Error('QueryHash.add expects 2 parameters, ' + arguments.length + ' given.');
-	            if (this.has(key)) throw new Error('Property "' + key + '" already exists in QueryHash instance');
 
-	            this._items[key] = val;
+	            this._items.push(new _QueryHashItem2.default(key, val));
 
 	            return this;
 	        }
@@ -125,7 +132,9 @@ var QueryHash =
 	            // do we really need to throw an error here? Or just skip the delete statement?
 	            if (!this.has(key)) throw new Error('Item "' + key + '" does not exist in instance of QueryHash');
 
-	            delete this._items[key];
+	            this._items = this._items.filter(function (item) {
+	                return item.key !== key;
+	            });
 
 	            return this;
 	        }
@@ -135,7 +144,7 @@ var QueryHash =
 	         * @public
 	         * @param {string} key - item key to find
 	         * @throws Error
-	         * @returns {boolean}
+	         * @returns {QueryHashItem[]}
 	         */
 
 	    }, {
@@ -144,7 +153,9 @@ var QueryHash =
 	            if (arguments.length !== 1) throw new Error('QueryHash.find expects one parameter, ' + arguments.length + ' given.');
 	            if (!this.has(key)) throw new Error('Item "' + key + '" does not exist in instance of QueryHash');
 
-	            return this._items[key];
+	            return this._items.filter(function (item) {
+	                return item.key === key;
+	            });
 	        }
 
 	        /**
@@ -156,7 +167,12 @@ var QueryHash =
 	    }, {
 	        key: 'keys',
 	        value: function keys() {
-	            return Object.keys(this._items);
+	            var seen = {};
+	            return this._items.map(function (item) {
+	                return item.key;
+	            }).filter(function (item) {
+	                return seen.hasOwnProperty(item) ? false : seen[item] = true;
+	            });
 	        }
 
 	        /**
@@ -169,7 +185,9 @@ var QueryHash =
 	    }, {
 	        key: 'has',
 	        value: function has(key) {
-	            return this._items.hasOwnProperty(key);
+	            return this._items.filter(function (item) {
+	                return item.key === key;
+	            }).length > 0;
 	        }
 
 	        /**
@@ -212,10 +230,8 @@ var QueryHash =
 	    }, {
 	        key: 'toQueryString',
 	        value: function toQueryString() {
-	            var _this = this;
-
-	            return this.keys().map(function (k) {
-	                return encodeURIComponent(k) + '=' + encodeURIComponent(_this.find(k) || '');
+	            return this._items.map(function (item) {
+	                return item.toString();
 	            }).join('&');
 	        }
 
@@ -253,12 +269,10 @@ var QueryHash =
 	            if (Object.prototype.toString.call(obj) !== '[object Object]') throw new Error('QueryHash.fromObject expects an object');
 
 	            this._items = Object.keys(obj).filter(function (key) {
-	                return obj[key] !== 'object';
-	            }).reduce(function (p, key) {
-	                p[key] = decodeURIComponent(obj[key] || '').replace(/\+/g, ' ');
-
-	                return p;
-	            }, {});
+	                return _typeof(obj[key]) !== 'object';
+	            }).map(function (key) {
+	                return new _QueryHashItem2.default(key, obj[key]);
+	            });
 
 	            return this;
 	        }
@@ -268,7 +282,7 @@ var QueryHash =
 	         * @private
 	         * @param {string} input
 	         * @param {boolean} isBase64
-	         * @returns {object}
+	         * @returns {QueryHashItem[]}
 	         */
 
 	    }, {
@@ -282,12 +296,9 @@ var QueryHash =
 	            }
 
 	            return qs.split('&').map(function (kv) {
-	                return kv.split('=');
-	            }).reduce(function (p, kv) {
-	                p[kv[0]] = decodeURIComponent(kv[1] || '').replace(/\+/g, ' ');
-
-	                return p;
-	            }, {});
+	                var p = kv.split('=');
+	                return new _QueryHashItem2.default(p[0], p[1]);
+	            });
 	        }
 
 	        /**
@@ -2332,6 +2343,56 @@ var QueryHash =
 	  return toString.call(arr) == '[object Array]';
 	};
 
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var QueryHashItem = function () {
+
+	    /**
+	     * A simple object with a unique id to keep track of key-value pairs
+	     * @param key
+	     * @param value
+	     * @returns {QueryHashItem}
+	     */
+	    function QueryHashItem(key, value) {
+	        _classCallCheck(this, QueryHashItem);
+
+	        this.key = key;
+	        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
+	        this.id = Date.now();
+
+	        return this;
+	    }
+
+	    /**
+	     * get a query string representation of the key-value data
+	     * @returns {string}
+	     */
+
+
+	    _createClass(QueryHashItem, [{
+	        key: 'toString',
+	        value: function toString() {
+	            return this.key + '=' + encodeURIComponent(this.value);
+	        }
+	    }]);
+
+	    return QueryHashItem;
+	}();
+
+	exports.default = QueryHashItem;
 
 /***/ }
 /******/ ]);
