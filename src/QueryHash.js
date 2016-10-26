@@ -1,7 +1,9 @@
 'use strict';
 
-class QueryHash {
+import Utils from './Utils';
+import QueryHashItem from './QueryHashItem';
 
+class QueryHash {
     /**
      * Create an instance of QueryHash
      * @Constructor
@@ -11,12 +13,12 @@ class QueryHash {
      * @returns {QueryHash} this, chainable
      */
     constructor(data) {
-        this._items = {};
+        this._items = [];
 
         if (arguments.length > 1)
             throw new Error('QueryHash constructor only accepts one optional parameter.');
         else if (typeof data === 'string')
-            this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);
+            this._fromString(data);
         else if (Object.prototype.toString.call(data) === '[object Object]')
             this.fromObject(data);
         else if (arguments.length !== 0)
@@ -36,18 +38,16 @@ class QueryHash {
     add(key, val) {
         if (arguments.length !== 2)
             throw new Error(`QueryHash.add expects 2 parameters, ${arguments.length} given.`);
-        if (this.has(key))
-            throw new Error(`Property "${key}" already exists in QueryHash instance`);
 
-        this._items[key] = val;
+        this._items.push(new QueryHashItem(key, val));
 
         return this;
     }
 
     /**
-     * Remove an item by it's key
+     * Remove items matching the given key
      * @public
-     * @param {string} key - item key to remove
+     * @param {string} key - Item key to remove
      * @throws Error
      * @returns {QueryHash} this, chainable
      */
@@ -58,17 +58,17 @@ class QueryHash {
         if (!this.has(key))
             throw new Error(`Item "${key}" does not exist in instance of QueryHash`);
 
-        delete this._items[key];
+        this._items = this._items.filter(item => item.key !== key);
 
         return this;
     }
 
     /**
-     * Find an item by its key
+     * Find items with a given key
      * @public
-     * @param {string} key - item key to find
+     * @param {string} key - Item key to find
      * @throws Error
-     * @returns {boolean}
+     * @returns {QueryHashItem[]}
      */
     find(key) {
         if (arguments.length !== 1)
@@ -76,26 +76,29 @@ class QueryHash {
         if (!this.has(key))
             throw new Error(`Item "${key}" does not exist in instance of QueryHash`);
 
-        return this._items[key];
+        return this._items.filter(item => item.key === key);
     }
 
     /**
-     * Return an array of the instance keys
+     * Return an array of unique item keys
      * @public
      * @returns {Array}
      */
     keys() {
-        return Object.keys(this._items);
+        let seen = {};
+        return this._items
+            .map(item => item.key)
+            .filter(item => seen.hasOwnProperty(item) ? false : (seen[item] = true));
     }
 
     /**
      * Test whether or not an item exists by its key
      * @public
-     * @param {string} key - item key to test
+     * @param {string} key - Item key to test
      * @returns {boolean}
      */
     has(key) {
-        return this._items.hasOwnProperty(key);
+        return this.keys().some(k => k === key);
     }
 
     /**
@@ -120,7 +123,7 @@ class QueryHash {
         if (typeof urlToken !== 'string')
             throw new Error(`QueryHash.fromUrlToken expects input to be of type string. Type ${Object.prototype.toString.call(urlToken)} provided`);
 
-        this._items = this._fromString(urlToken, true);
+        this._fromString(urlToken, true);
 
         return this;
     }
@@ -131,9 +134,7 @@ class QueryHash {
      * @returns {string}
      */
     toQueryString() {
-        return this.keys()
-            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(this.find(k) || ''))
-            .join('&');
+        return this._items.map(item => item.toString()).join('&');
     }
 
     /**
@@ -149,7 +150,7 @@ class QueryHash {
         if (typeof qs !== 'string')
             throw new Error(`QueryHash.fromQueryString expects input to be of type string. Type ${Object.prototype.toString.call(qs)} provided`);
 
-        this._items = this._fromString(qs, false);
+        this._fromString(qs, false);
 
         return this;
     }
@@ -167,56 +168,31 @@ class QueryHash {
         if (Object.prototype.toString.call(obj) !== '[object Object]')
             throw new Error('QueryHash.fromObject expects an object');
 
-        this._items = Object.keys(obj)
+        Object.keys(obj)
             .filter(key => typeof obj[key] !== 'object')
-            .reduce((p, key) => {
-                p[key] = decodeURIComponent(obj[key] || '').replace(/\+/g, ' ');
-
-                return p;
-            }, {});
+            .forEach(key => this.add(key, obj[key]));
 
         return this;
     }
 
     /**
-     * Translate string input to an object
+     * Store string input internally in instance._items
      * @private
-     * @param {string} input
-     * @param {boolean} isBase64
-     * @returns {object}
+     * @param {string} input - Query string (can be base64 encoded)
+     * @param {boolean} [isBase64] - Indicates whether or not the string is base64 encoded
+     * @returns {QueryHashItem[]}
      */
     _fromString(input, isBase64) {
-        let qs = input;
-        if (isBase64)
-            qs = Buffer.from(input, 'base64').toString();
-
-        if (qs.indexOf('?') === 0) {
-            qs = qs.slice(1);
+        if (isBase64 === void 0) {
+            isBase64 = Utils.isBase64(input);
         }
 
-        return qs.split('&')
+        let qs = isBase64 ? Buffer.from(input, 'base64').toString() : input;
+        let clean = Utils.trimStringEntry(qs);
+
+        clean.split('&')
             .map(kv => kv.split('='))
-            .reduce((p, kv) => {
-                p[kv[0]] = decodeURIComponent(kv[1] || '').replace(/\+/g, ' ');
-
-                return p;
-            }, {});
-    }
-
-    /**
-     * Test whether or not input is a base64 string
-     * @private
-     * @param {string} maybe64
-     * @returns {boolean}
-     */
-    _isBase64(maybe64) {
-        if (typeof maybe64 !== 'string') {
-            return false;
-        }
-        //noinspection JSCheckFunctionSignatures
-        let regex = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
-
-        return regex.test(maybe64);
+            .forEach(p => this.add(p[0], p[1]));
     }
 }
 

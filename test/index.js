@@ -10,18 +10,26 @@ describe('QueryHash Constructor', function () {
     });
 
     it('Accept query string parameter', () => {
-        let q = new QueryHash('test=passed&again=too');
+        let q = new QueryHash('foo=bar&baz=too');
 
         expect(q).to.be.an.instanceof(QueryHash);
-        expect(q.find('test')).to.equal('passed');
+
+        let foo = q.find('foo');
+        expect(foo).to.have.lengthOf(1);
+        expect(Object.keys(foo[0])).to.have.lengthOf(3);
+        expect(foo[0].value).to.equal('bar');
     });
 
     it('Accept query string parameter with a trailing empty value', () => {
         let q = new QueryHash('test=passed&again=');
 
         expect(q).to.be.an.instanceof(QueryHash);
-        expect(q.find('test')).to.equal('passed');
-        expect(q.find('again')).to.equal('');
+
+        expect(q.find('test')).to.have.lengthOf(1);
+        expect(q.find('test')[0].value).to.equal('passed');
+
+        expect(q.find('again')).to.have.lengthOf(1);
+        expect(q.find('again')[0].value).to.equal('');
     });
 
     it('Accept base64 string parameter', () => {
@@ -59,10 +67,16 @@ describe('QueryHash.add method', function () {
     let q = new QueryHash();
 
     it('Add two key-values to the instance', () => {
-        q.add('first', 'passed');
+        q.add('foo', 'bar');
         q.add('second', 'also-passed');
 
         expect(q.keys()).to.have.lengthOf(2);
+    });
+
+    it('Accepts a different value with the same key', () => {
+        q.add('foo', 'baz');
+
+        expect(q.find('foo')).to.have.lengthOf(2);
     });
 
     it('Throw an exception if 0 parameters are given', () => {
@@ -72,7 +86,6 @@ describe('QueryHash.add method', function () {
     it('Throw an exception if 1 parameter is given', () => {
         expect(q.add.bind(q, 'test')).to.throw('QueryHash.add expects 2 parameters, 1 given');
     });
-
 });
 
 describe('QueryHash.remove method', function () {
@@ -93,12 +106,23 @@ describe('QueryHash.remove method', function () {
 });
 
 describe('QueryHash.find method', function () {
-    let q = new QueryHash(); 
-    q.add('white', 'house');
-    q.add('green', 'car');
+    let q = new QueryHash();
+    q.add('foo', 'bar');
+    q.add('baz', 'car');
 
     it('Find a value by its key', () => {
-        expect(q.find('white')).to.equal('house');
+        let foo = q.find('foo');
+        expect(foo).to.have.lengthOf(1);
+        expect(foo[0].value).to.equal('bar');
+    });
+
+    it('Find mutli-value key values', () => {
+        q.add('baz', 'boat');
+
+        let bazItems = q.find('baz');
+        expect(bazItems).to.have.lengthOf(2);
+        expect(bazItems[0].key).to.equal('baz');
+        expect(bazItems[1].key).to.equal('baz');
     });
 
     it('Throw an exception if 0 parameters are given', () => {
@@ -123,21 +147,35 @@ describe('QueryHash.has method', function () {
 
 describe('QueryHash.keys method', function () {
     let q = new QueryHash();
-    q.fromQueryString('test=passed&again=hooray');
+    q.fromQueryString('foo=bar&baz=car');
 
     it('Returns an array of query string keys', () => {
         expect(q.keys()).to.have.lengthOf(2);
-        expect(q.keys()).to.deep.equal(['test', 'again']);
+        expect(q.keys()).to.deep.equal(['foo', 'baz']);
+    });
+
+    it('Should only return one key for multi-value keys', () => {
+        q.remove('baz');
+        q.add('foo', '');
+
+        expect(q.keys()).to.have.lengthOf(1);
+        expect(q.keys()).to.deep.equal(['foo']);
     });
 });
 
 describe('QueryHash.toQueryString method', function () {
     let q = new QueryHash();
-    q.add('test', 'passed');
-    q.add('again', 'hooray');
+    q.add('foo', 'bar');
+    q.add('baz', 'raz');
 
     it('Create a query string from instance key-values', () => {
-        expect(q.toQueryString()).to.equal('test=passed&again=hooray');
+        expect(q.toQueryString()).to.equal('foo=bar&baz=raz');
+    });
+
+    it('Create a valid query string with multi-value key', () => {
+        q.add('foo', 'snow');
+
+        expect(q.toQueryString()).to.equal('foo=bar&baz=raz&foo=snow');
     });
 });
 
@@ -153,7 +191,7 @@ describe('QueryHash.fromQueryString method', function () {
 describe('QueryHash.toUrlToken method', () => {
     let q = new QueryHash();
     q.add('test', 'passed');
-    
+
     it('Return a base64 encoded string', () => {
         expect(q.toUrlToken()).to.equal('dGVzdD1wYXNzZWQ=');
     });
@@ -165,7 +203,7 @@ describe('QueryHash.fromUrlToken method', function () {
     it('Accept a base64 string', () => {
         q.fromUrlToken('dGVzdD1wYXNzZWQ=');
 
-        expect(q.find('test')).to.equal('passed');
+        expect(q.find('test')[0].value).to.equal('passed');
     });
 });
 
@@ -176,7 +214,7 @@ describe('QueryHash.fromObject method', function () {
         item: 'is',
         a: 'test object'
     };
-    
+
     it('Throw an exception when no params passed', () => {
         expect(q.fromObject.bind(q)).to.throw('QueryHash.fromObject expects one parameter, 0 given');
     });
@@ -191,5 +229,19 @@ describe('QueryHash.fromObject method', function () {
         q.fromObject(fakeData);
 
         expect(q.toQueryString()).to.equal('item=is&a=test%20object');
+    });
+
+    it('Filters out non primitives', () => {
+        let fake2 = {
+            items: [],
+            more: {},
+            foo: 'bar',
+            baz: 1
+        };
+
+        let q2 = new QueryHash();
+        q2.fromObject(fake2);
+        expect(q2.toQueryString()).to.equal('foo=bar&baz=1');
+        expect(q2.keys()).to.deep.equal(['foo', 'baz']);
     });
 });
