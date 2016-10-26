@@ -187,11 +187,7 @@ class QueryHash {
             isBase64 = Utils.isBase64(input);
         }
 
-        let qs = input;
-        if (isBase64) {
-            qs = Buffer.from(input, 'base64').toString();
-        }
-
+        let qs = isBase64 ? Buffer.from(input, 'base64').toString() : input;
         let clean = Utils.trimStringEntry(qs);
 
         clean.split('&')

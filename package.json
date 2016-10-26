@@ -1,6 +1,6 @@
 {
   "name": "query-hash",
-  "version": "2.0.0rc-1",
+  "version": "2.0.0",
   "description": "QueryHash is a simple class for handling/creating query strings and base64 query string tokens",
   "main": "query-hash.js",
   "repository": "https://github.com/bcruddy/query-hash",

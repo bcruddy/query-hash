@@ -132,7 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Remove items matching the given key
 	         * @public
-	         * @param {string} key - item key to remove
+	         * @param {string} key - Item key to remove
 	         * @throws Error
 	         * @returns {QueryHash} this, chainable
 	         */
@@ -154,7 +154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Find items with a given key
 	         * @public
-	         * @param {string} key - item key to find
+	         * @param {string} key - Item key to find
 	         * @throws Error
 	         * @returns {QueryHashItem[]}
 	         */
@@ -171,7 +171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
-	         * Return an array of unique instance keys
+	         * Return an array of unique item keys
 	         * @public
 	         * @returns {Array}
 	         */
@@ -190,7 +190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Test whether or not an item exists by its key
 	         * @public
-	         * @param {string} key - item key to test
+	         * @param {string} key - Item key to test
 	         * @returns {boolean}
 	         */
 
@@ -308,11 +308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                isBase64 = _Utils2.default.isBase64(input);
 	            }
 
-	            var qs = input;
-	            if (isBase64) {
-	                qs = Buffer.from(input, 'base64').toString();
-	            }
-
+	            var qs = isBase64 ? Buffer.from(input, 'base64').toString() : input;
 	            var clean = _Utils2.default.trimStringEntry(qs);
 
 	            clean.split('&').map(function (kv) {
