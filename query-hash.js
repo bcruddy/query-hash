@@ -78,7 +78,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _QueryHashItem = __webpack_require__(6);
+	var _Utils = __webpack_require__(6);
+
+	var _Utils2 = _interopRequireDefault(_Utils);
+
+	var _QueryHashItem = __webpack_require__(7);
 
 	var _QueryHashItem2 = _interopRequireDefault(_QueryHashItem);
 
@@ -87,7 +91,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var QueryHash = function () {
-
 	    /**
 	     * Create an instance of QueryHash
 	     * @Constructor
@@ -101,7 +104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        this._items = [];
 
-	        if (arguments.length > 1) throw new Error('QueryHash constructor only accepts one optional parameter.');else if (typeof data === 'string') this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);else if (Object.prototype.toString.call(data) === '[object Object]') this.fromObject(data);else if (arguments.length !== 0) throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
+	        if (arguments.length > 1) throw new Error('QueryHash constructor only accepts one optional parameter.');else if (typeof data === 'string') this._fromString(data);else if (Object.prototype.toString.call(data) === '[object Object]') this.fromObject(data);else if (arguments.length !== 0) throw new Error('QueryHash constructor only accepts a query string, base64 string, or a plain object.');
 
 	        return this;
 	    }
@@ -291,8 +294,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * Store string input internally in instance._items
 	         * @private
-	         * @param {string} input
-	         * @param {boolean} isBase64
+	         * @param {string} input - Query string (can be base64 encoded)
+	         * @param {boolean} [isBase64] - Indicates whether or not the string is base64 encoded
 	         * @returns {QueryHashItem[]}
 	         */
 
@@ -301,52 +304,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function _fromString(input, isBase64) {
 	            var _this2 = this;
 
+	            if (isBase64 === void 0) {
+	                isBase64 = _Utils2.default.isBase64(input);
+	            }
+
 	            var qs = input;
 	            if (isBase64) {
 	                qs = Buffer.from(input, 'base64').toString();
 	            }
 
-	            var clean = this._trimStringEntry(qs);
+	            var clean = _Utils2.default.trimStringEntry(qs);
 
 	            clean.split('&').map(function (kv) {
 	                return kv.split('=');
 	            }).forEach(function (p) {
 	                return _this2.add(p[0], p[1]);
 	            });
-	        }
-
-	        /**
-	         * Trim excess whitespace and leading '?' from a query string
-	         * @private
-	         * @param {string} qs
-	         * @returns {string}
-	         */
-
-	    }, {
-	        key: '_trimStringEntry',
-	        value: function _trimStringEntry(qs) {
-	            var trimmed = qs.trim();
-
-	            return trimmed.indexOf('?') === 0 ? trimmed.slice(1) : trimmed;
-	        }
-
-	        /**
-	         * Test whether or not input is a base64 string
-	         * @private
-	         * @param {string} maybe64
-	         * @returns {boolean}
-	         */
-
-	    }, {
-	        key: '_isBase64',
-	        value: function _isBase64(maybe64) {
-	            if (typeof maybe64 !== 'string') {
-	                return false;
-	            }
-	            //noinspection JSCheckFunctionSignatures
-	            var validBase64 = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
-
-	            return validBase64.test(maybe64);
 	        }
 	    }]);
 
@@ -2387,8 +2360,93 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var QueryHashItem = function () {
+	var Utils = function () {
+	    function Utils() {
+	        _classCallCheck(this, Utils);
+	    }
 
+	    _createClass(Utils, null, [{
+	        key: 'genUuid',
+
+	        /**
+	         * Generate a unique id consisting of 4 groups of 4 Az chars separated by a '-'
+	         * @returns {string}
+	         */
+	        value: function genUuid() {
+	            var id = '';
+	            while (id.length < 20) {
+	                if (id.length === 4 || id.length && id.length % 5 === 0) {
+	                    id += '-';
+	                }
+
+	                var capOffset = Math.random() < .5 ? 65 : 97;
+	                id += String.fromCharCode(Date.now() * Math.round(Math.random() * 100000) % 26 + capOffset);
+	            }
+
+	            return id;
+	        }
+
+	        /**
+	         * Trim excess whitespace and leading '?' from a query string
+	         * @private
+	         * @param {string} qs
+	         * @returns {string}
+	         */
+
+	    }, {
+	        key: 'trimStringEntry',
+	        value: function trimStringEntry(qs) {
+	            var trimmed = qs.trim();
+
+	            return trimmed.indexOf('?') === 0 ? trimmed.slice(1) : trimmed;
+	        }
+
+	        /**
+	         * Test whether or not input is a base64 string
+	         * @private
+	         * @param {string} maybe64
+	         * @returns {boolean}
+	         */
+
+	    }, {
+	        key: 'isBase64',
+	        value: function isBase64(maybe64) {
+	            if (typeof maybe64 !== 'string') {
+	                return false;
+	            }
+	            //noinspection JSCheckFunctionSignatures
+	            var validBase64 = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
+
+	            return validBase64.test(maybe64);
+	        }
+	    }]);
+
+	    return Utils;
+	}();
+
+	exports.default = Utils;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _Utils = __webpack_require__(6);
+
+	var _Utils2 = _interopRequireDefault(_Utils);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var QueryHashItem = function () {
 	    /**
 	     * A simple object with a unique id to keep track of key-value pairs
 	     * @param {string} key
@@ -2400,7 +2458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        this.key = key;
 	        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
-	        this.id = this._genUuid();
+	        this.id = _Utils2.default.genUuid();
 
 	        return this;
 	    }
@@ -2418,21 +2476,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var delimiter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '=';
 
 	            return [this.key, encodeURIComponent(this.value)].join(delimiter);
-	        }
-	    }, {
-	        key: '_genUuid',
-	        value: function _genUuid() {
-	            var id = '';
-	            while (id.length < 20) {
-	                if (id.length === 4 || id.length && id.length % 5 === 0) {
-	                    id += '-';
-	                }
-
-	                var capOffset = Math.random() < .5 ? 65 : 97;
-	                id += String.fromCharCode(Date.now() * Math.round(Math.random() * 100000) % 26 + capOffset);
-	            }
-
-	            return id;
 	        }
 	    }]);
 

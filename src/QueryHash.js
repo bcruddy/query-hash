@@ -1,9 +1,9 @@
 'use strict';
 
+import Utils from './Utils';
 import QueryHashItem from './QueryHashItem';
 
 class QueryHash {
-
     /**
      * Create an instance of QueryHash
      * @Constructor
@@ -18,7 +18,7 @@ class QueryHash {
         if (arguments.length > 1)
             throw new Error('QueryHash constructor only accepts one optional parameter.');
         else if (typeof data === 'string')
-            this._isBase64(data) ? this.fromUrlToken(data) : this.fromQueryString(data);
+            this._fromString(data);
         else if (Object.prototype.toString.call(data) === '[object Object]')
             this.fromObject(data);
         else if (arguments.length !== 0)
@@ -47,7 +47,7 @@ class QueryHash {
     /**
      * Remove items matching the given key
      * @public
-     * @param {string} key - item key to remove
+     * @param {string} key - Item key to remove
      * @throws Error
      * @returns {QueryHash} this, chainable
      */
@@ -66,7 +66,7 @@ class QueryHash {
     /**
      * Find items with a given key
      * @public
-     * @param {string} key - item key to find
+     * @param {string} key - Item key to find
      * @throws Error
      * @returns {QueryHashItem[]}
      */
@@ -80,7 +80,7 @@ class QueryHash {
     }
 
     /**
-     * Return an array of unique instance keys
+     * Return an array of unique item keys
      * @public
      * @returns {Array}
      */
@@ -94,7 +94,7 @@ class QueryHash {
     /**
      * Test whether or not an item exists by its key
      * @public
-     * @param {string} key - item key to test
+     * @param {string} key - Item key to test
      * @returns {boolean}
      */
     has(key) {
@@ -134,9 +134,7 @@ class QueryHash {
      * @returns {string}
      */
     toQueryString() {
-        return this._items
-            .map(item => item.toString())
-            .join('&');
+        return this._items.map(item => item.toString()).join('&');
     }
 
     /**
@@ -180,49 +178,25 @@ class QueryHash {
     /**
      * Store string input internally in instance._items
      * @private
-     * @param {string} input
-     * @param {boolean} isBase64
+     * @param {string} input - Query string (can be base64 encoded)
+     * @param {boolean} [isBase64] - Indicates whether or not the string is base64 encoded
      * @returns {QueryHashItem[]}
      */
     _fromString(input, isBase64) {
+        if (isBase64 === void 0) {
+            isBase64 = Utils.isBase64(input);
+        }
+
         let qs = input;
         if (isBase64) {
             qs = Buffer.from(input, 'base64').toString();
         }
 
-        let clean = this._trimStringEntry(qs);
+        let clean = Utils.trimStringEntry(qs);
 
         clean.split('&')
             .map(kv => kv.split('='))
             .forEach(p => this.add(p[0], p[1]));
-    }
-
-    /**
-     * Trim excess whitespace and leading '?' from a query string
-     * @private
-     * @param {string} qs
-     * @returns {string}
-     */
-    _trimStringEntry(qs) {
-        let trimmed = qs.trim();
-
-        return trimmed.indexOf('?') === 0 ? trimmed.slice(1) : trimmed;
-    }
-
-    /**
-     * Test whether or not input is a base64 string
-     * @private
-     * @param {string} maybe64
-     * @returns {boolean}
-     */
-    _isBase64(maybe64) {
-        if (typeof maybe64 !== 'string') {
-            return false;
-        }
-        //noinspection JSCheckFunctionSignatures
-        let validBase64 = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
-
-        return validBase64.test(maybe64);
     }
 }
 

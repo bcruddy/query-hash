@@ -1,7 +1,8 @@
 'use strict';
 
-class QueryHashItem {
+import Utils from './Utils';
 
+class QueryHashItem {
     /**
      * A simple object with a unique id to keep track of key-value pairs
      * @param {string} key
@@ -11,7 +12,7 @@ class QueryHashItem {
     constructor(key, value) {
         this.key = key;
         this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
-        this.id = this._genUuid();
+        this.id = Utils.genUuid();
 
         return this;
     }
@@ -23,20 +24,6 @@ class QueryHashItem {
      */
     toString(delimiter = '=') {
         return [this.key, encodeURIComponent(this.value)].join(delimiter);
-    }
-
-    _genUuid() {
-        let id = '';
-        while (id.length < 20) {
-            if (id.length === 4 || (id.length && id.length % 5 === 0)) {
-                id += '-';
-            }
-
-            let capOffset = Math.random() < .5 ? 65 : 97;
-            id += String.fromCharCode(((Date.now() * Math.round(Math.random() * 100000)) % 26) + capOffset);
-        }
-
-        return id;
     }
 }
 

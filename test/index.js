@@ -106,7 +106,7 @@ describe('QueryHash.remove method', function () {
 });
 
 describe('QueryHash.find method', function () {
-    let q = new QueryHash(); 
+    let q = new QueryHash();
     q.add('foo', 'bar');
     q.add('baz', 'car');
 
@@ -191,7 +191,7 @@ describe('QueryHash.fromQueryString method', function () {
 describe('QueryHash.toUrlToken method', () => {
     let q = new QueryHash();
     q.add('test', 'passed');
-    
+
     it('Return a base64 encoded string', () => {
         expect(q.toUrlToken()).to.equal('dGVzdD1wYXNzZWQ=');
     });
@@ -214,7 +214,7 @@ describe('QueryHash.fromObject method', function () {
         item: 'is',
         a: 'test object'
     };
-    
+
     it('Throw an exception when no params passed', () => {
         expect(q.fromObject.bind(q)).to.throw('QueryHash.fromObject expects one parameter, 0 given');
     });
