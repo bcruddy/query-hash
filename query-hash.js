@@ -127,7 +127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
-	         * Remove an item by it's key
+	         * Remove items matching the given key
 	         * @public
 	         * @param {string} key - item key to remove
 	         * @throws Error
@@ -149,7 +149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
-	         * Find an item by its key
+	         * Find items with a given key
 	         * @public
 	         * @param {string} key - item key to find
 	         * @throws Error
@@ -168,7 +168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
-	         * Return an array of the instance keys
+	         * Return an array of unique instance keys
 	         * @public
 	         * @returns {Array}
 	         */
@@ -194,9 +194,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'has',
 	        value: function has(key) {
-	            return this._items.filter(function (item) {
-	                return item.key === key;
-	            }).length > 0;
+	            return this.keys().some(function (k) {
+	                return k === key;
+	            });
 	        }
 
 	        /**
@@ -225,7 +225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (arguments.length !== 1) throw new Error('QueryHash.fromUrlToken expects 1 parameter. ' + arguments.length + ' given.');
 	            if (typeof urlToken !== 'string') throw new Error('QueryHash.fromUrlToken expects input to be of type string. Type ' + Object.prototype.toString.call(urlToken) + ' provided');
 
-	            this._items = this._fromString(urlToken, true);
+	            this._fromString(urlToken, true);
 
 	            return this;
 	        }
@@ -258,7 +258,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (arguments.length !== 1) throw new Error('QueryHash.fromQueryString expects 1 parameter. ' + arguments.length + ' given.');
 	            if (typeof qs !== 'string') throw new Error('QueryHash.fromQueryString expects input to be of type string. Type ' + Object.prototype.toString.call(qs) + ' provided');
 
-	            this._items = this._fromString(qs, false);
+	            this._fromString(qs, false);
 
 	            return this;
 	        }
@@ -274,20 +274,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'fromObject',
 	        value: function fromObject(obj) {
+	            var _this = this;
+
 	            if (arguments.length !== 1) throw new Error('QueryHash.fromObject expects one parameter, ' + arguments.length + ' given.');
 	            if (Object.prototype.toString.call(obj) !== '[object Object]') throw new Error('QueryHash.fromObject expects an object');
 
-	            this._items = Object.keys(obj).filter(function (key) {
+	            Object.keys(obj).filter(function (key) {
 	                return _typeof(obj[key]) !== 'object';
-	            }).map(function (key) {
-	                return new _QueryHashItem2.default(key, obj[key]);
+	            }).forEach(function (key) {
+	                return _this.add(key, obj[key]);
 	            });
 
 	            return this;
 	        }
 
 	        /**
-	         * Translate string input to an object
+	         * Store string input internally in instance._items
 	         * @private
 	         * @param {string} input
 	         * @param {boolean} isBase64
@@ -297,17 +299,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '_fromString',
 	        value: function _fromString(input, isBase64) {
-	            var qs = input;
-	            if (isBase64) qs = Buffer.from(input, 'base64').toString();
+	            var _this2 = this;
 
-	            if (qs.indexOf('?') === 0) {
-	                qs = qs.slice(1);
+	            var qs = input;
+	            if (isBase64) {
+	                qs = Buffer.from(input, 'base64').toString();
 	            }
 
-	            return qs.split('&').map(function (kv) {
-	                var p = kv.split('=');
-	                return new _QueryHashItem2.default(p[0], p[1]);
+	            var clean = this._trimStringEntry(qs);
+
+	            clean.split('&').map(function (kv) {
+	                return kv.split('=');
+	            }).forEach(function (p) {
+	                return _this2.add(p[0], p[1]);
 	            });
+	        }
+
+	        /**
+	         * Trim excess whitespace and leading '?' from a query string
+	         * @private
+	         * @param {string} qs
+	         * @returns {string}
+	         */
+
+	    }, {
+	        key: '_trimStringEntry',
+	        value: function _trimStringEntry(qs) {
+	            var trimmed = qs.trim();
+
+	            return trimmed.indexOf('?') === 0 ? trimmed.slice(1) : trimmed;
 	        }
 
 	        /**
@@ -324,9 +344,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return false;
 	            }
 	            //noinspection JSCheckFunctionSignatures
-	            var regex = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
+	            var validBase64 = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
 
-	            return regex.test(maybe64);
+	            return validBase64.test(maybe64);
 	        }
 	    }]);
 
@@ -2371,8 +2391,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * A simple object with a unique id to keep track of key-value pairs
-	     * @param key
-	     * @param value
+	     * @param {string} key
+	     * @param {string|number|boolean} value
 	     * @returns {QueryHashItem}
 	     */
 	    function QueryHashItem(key, value) {
@@ -2380,13 +2400,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        this.key = key;
 	        this.value = decodeURIComponent(value || '').replace(/\+/g, ' ');
-	        this.id = Date.now();
+	        this.id = this._genUuid();
 
 	        return this;
 	    }
 
 	    /**
 	     * get a query string representation of the key-value data
+	     * @param {string} [delimiter="="] -
 	     * @returns {string}
 	     */
 
@@ -2394,7 +2415,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(QueryHashItem, [{
 	        key: 'toString',
 	        value: function toString() {
-	            return this.key + '=' + encodeURIComponent(this.value);
+	            var delimiter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '=';
+
+	            return [this.key, encodeURIComponent(this.value)].join(delimiter);
+	        }
+	    }, {
+	        key: '_genUuid',
+	        value: function _genUuid() {
+	            var id = '';
+	            while (id.length < 20) {
+	                if (id.length && id.length % 5 === 0) {
+	                    id += '-';
+	                }
+
+	                var capOffset = Math.random() < .5 ? 65 : 97;
+	                id += String.fromCharCode(Date.now() * Math.round(Math.random() * 100000) % 26 + capOffset);
+	            }
+
+	            return id;
 	        }
 	    }]);
 

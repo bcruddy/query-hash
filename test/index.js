@@ -75,6 +75,7 @@ describe('QueryHash.add method', function () {
 
     it('Accepts a different value with the same key', () => {
         q.add('foo', 'baz');
+
         expect(q.find('foo')).to.have.lengthOf(2);
     });
 
@@ -85,7 +86,6 @@ describe('QueryHash.add method', function () {
     it('Throw an exception if 1 parameter is given', () => {
         expect(q.add.bind(q, 'test')).to.throw('QueryHash.add expects 2 parameters, 1 given');
     });
-
 });
 
 describe('QueryHash.remove method', function () {
@@ -219,6 +219,18 @@ describe('QueryHash.fromObject method', function () {
         expect(q.fromObject.bind(q)).to.throw('QueryHash.fromObject expects one parameter, 0 given');
     });
 
+    it('Throw an exception if the argument passed isnt an object', () => {
+        expect(q.fromObject.bind(q, null)).to.throw('QueryHash.fromObject expects an object');
+        expect(q.fromObject.bind(q, '')).to.throw('QueryHash.fromObject expects an object');
+        expect(q.fromObject.bind(q, false)).to.throw('QueryHash.fromObject expects an object');
+    });
+
+    it('Transforms fakeData from object to query string', () => {
+        q.fromObject(fakeData);
+
+        expect(q.toQueryString()).to.equal('item=is&a=test%20object');
+    });
+
     it('Filters out non primitives', () => {
         let fake2 = {
             items: [],
@@ -231,17 +243,5 @@ describe('QueryHash.fromObject method', function () {
         q2.fromObject(fake2);
         expect(q2.toQueryString()).to.equal('foo=bar&baz=1');
         expect(q2.keys()).to.deep.equal(['foo', 'baz']);
-    });
-
-    it('Throw an exception if the argument passed isnt an object', () => {
-        expect(q.fromObject.bind(q, null)).to.throw('QueryHash.fromObject expects an object');
-        expect(q.fromObject.bind(q, '')).to.throw('QueryHash.fromObject expects an object');
-        expect(q.fromObject.bind(q, false)).to.throw('QueryHash.fromObject expects an object');
-    });
-
-    it('Transforms fakeData from object to query string', () => {
-        q.fromObject(fakeData);
-
-        expect(q.toQueryString()).to.equal('item=is&a=test%20object');
     });
 });

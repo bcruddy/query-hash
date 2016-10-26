@@ -45,7 +45,7 @@ class QueryHash {
     }
 
     /**
-     * Remove an item by it's key
+     * Remove items matching the given key
      * @public
      * @param {string} key - item key to remove
      * @throws Error
@@ -64,7 +64,7 @@ class QueryHash {
     }
 
     /**
-     * Find an item by its key
+     * Find items with a given key
      * @public
      * @param {string} key - item key to find
      * @throws Error
@@ -80,7 +80,7 @@ class QueryHash {
     }
 
     /**
-     * Return an array of the instance keys
+     * Return an array of unique instance keys
      * @public
      * @returns {Array}
      */
@@ -98,7 +98,7 @@ class QueryHash {
      * @returns {boolean}
      */
     has(key) {
-        return this._items.filter(item => item.key === key).length > 0;
+        return this.keys().some(k => k === key);
     }
 
     /**
@@ -123,7 +123,7 @@ class QueryHash {
         if (typeof urlToken !== 'string')
             throw new Error(`QueryHash.fromUrlToken expects input to be of type string. Type ${Object.prototype.toString.call(urlToken)} provided`);
 
-        this._items = this._fromString(urlToken, true);
+        this._fromString(urlToken, true);
 
         return this;
     }
@@ -134,7 +134,9 @@ class QueryHash {
      * @returns {string}
      */
     toQueryString() {
-        return this._items.map(item => item.toString()).join('&');
+        return this._items
+            .map(item => item.toString())
+            .join('&');
     }
 
     /**
@@ -150,7 +152,7 @@ class QueryHash {
         if (typeof qs !== 'string')
             throw new Error(`QueryHash.fromQueryString expects input to be of type string. Type ${Object.prototype.toString.call(qs)} provided`);
 
-        this._items = this._fromString(qs, false);
+        this._fromString(qs, false);
 
         return this;
     }
@@ -168,15 +170,15 @@ class QueryHash {
         if (Object.prototype.toString.call(obj) !== '[object Object]')
             throw new Error('QueryHash.fromObject expects an object');
 
-        this._items = Object.keys(obj)
+        Object.keys(obj)
             .filter(key => typeof obj[key] !== 'object')
-            .map(key => new QueryHashItem(key, obj[key]));
+            .forEach(key => this.add(key, obj[key]));
 
         return this;
     }
 
     /**
-     * Translate string input to an object
+     * Store string input internally in instance._items
      * @private
      * @param {string} input
      * @param {boolean} isBase64
@@ -184,18 +186,27 @@ class QueryHash {
      */
     _fromString(input, isBase64) {
         let qs = input;
-        if (isBase64)
+        if (isBase64) {
             qs = Buffer.from(input, 'base64').toString();
-
-        if (qs.indexOf('?') === 0) {
-            qs = qs.slice(1);
         }
 
-        return qs.split('&')
-                .map(kv => {
-                    let p = kv.split('=');
-                    return new QueryHashItem(p[0], p[1])
-                });
+        let clean = this._trimStringEntry(qs);
+
+        clean.split('&')
+            .map(kv => kv.split('='))
+            .forEach(p => this.add(p[0], p[1]));
+    }
+
+    /**
+     * Trim excess whitespace and leading '?' from a query string
+     * @private
+     * @param {string} qs
+     * @returns {string}
+     */
+    _trimStringEntry(qs) {
+        let trimmed = qs.trim();
+
+        return trimmed.indexOf('?') === 0 ? trimmed.slice(1) : trimmed;
     }
 
     /**
@@ -209,9 +220,9 @@ class QueryHash {
             return false;
         }
         //noinspection JSCheckFunctionSignatures
-        let regex = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
+        let validBase64 = new RegExp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/);
 
-        return regex.test(maybe64);
+        return validBase64.test(maybe64);
     }
 }
 
