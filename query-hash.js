@@ -2424,7 +2424,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function _genUuid() {
 	            var id = '';
 	            while (id.length < 20) {
-	                if (id.length && id.length % 5 === 0) {
+	                if (id.length === 4 || id.length && id.length % 5 === 0) {
 	                    id += '-';
 	                }
 

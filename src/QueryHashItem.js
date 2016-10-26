@@ -27,8 +27,8 @@ class QueryHashItem {
 
     _genUuid() {
         let id = '';
-        while(id.length < 20) {
-            if (id.length && id.length % 5 === 0) {
+        while (id.length < 20) {
+            if (id.length === 4 || (id.length && id.length % 5 === 0)) {
                 id += '-';
             }
 
