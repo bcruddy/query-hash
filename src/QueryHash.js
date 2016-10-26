@@ -80,6 +80,23 @@ class QueryHash {
     }
 
     /**
+     * Return the first value found matching the given key. Useful when keys are unique.
+     * @param {string} key - Return the item value with this key
+     * @returns {string|null}
+     */
+    first(key) {
+        if (arguments.length !== 1)
+            throw new Error(`QueryHash.first expects one parameter, ${arguments.length} given.`);
+
+        if (!this.has(key))
+            return null;
+
+        let item = this.find(key)[0];
+
+        return item ? item.value : null;
+    }
+
+    /**
      * Return an array of unique item keys
      * @public
      * @returns {Array}

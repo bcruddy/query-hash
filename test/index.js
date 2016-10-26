@@ -130,6 +130,22 @@ describe('QueryHash.find method', function () {
     });
 });
 
+describe('QueryHash.first method', function () {
+    let q = new QueryHash({ foo: 'bar', baz: 12 });
+
+    it('Finds the a value by its key', () => {
+        expect(q.first('foo')).to.equal('bar');
+    });
+
+    it('Throw an exception if 0 parameters are given', () => {
+        expect(q.first.bind(q)).to.throw('QueryHash.first expects one parameter, 0 given');
+    });
+
+    it('Return null if requested key does not exist', () => {
+        expect(q.first('not here')).to.equal(null);
+    });
+});
+
 describe('QueryHash.has method', function () {
     let q = new QueryHash();
     q.add('whoa', 'dude');

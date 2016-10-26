@@ -171,6 +171,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
+	         * Return the first value found matching the given key. Useful when keys are unique.
+	         * @param {string} key - Return the item value with this key
+	         * @returns {string|null}
+	         */
+
+	    }, {
+	        key: 'first',
+	        value: function first(key) {
+	            if (arguments.length !== 1) throw new Error('QueryHash.first expects one parameter, ' + arguments.length + ' given.');
+
+	            if (!this.has(key)) return null;
+
+	            var item = this.find(key)[0];
+
+	            return item ? item.value : null;
+	        }
+
+	        /**
 	         * Return an array of unique item keys
 	         * @public
 	         * @returns {Array}
@@ -2366,6 +2384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Generate a unique id consisting of 4 groups of 4 Az chars separated by a '-'
+	         * @public
 	         * @returns {string}
 	         */
 	        value: function genUuid() {
@@ -2384,7 +2403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Trim excess whitespace and leading '?' from a query string
-	         * @private
+	         * @public
 	         * @param {string} qs
 	         * @returns {string}
 	         */
@@ -2399,7 +2418,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        /**
 	         * Test whether or not input is a base64 string
-	         * @private
+	         * @public
 	         * @param {string} maybe64
 	         * @returns {boolean}
 	         */

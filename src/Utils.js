@@ -3,6 +3,7 @@
 class Utils {
     /**
      * Generate a unique id consisting of 4 groups of 4 Az chars separated by a '-'
+     * @public
      * @returns {string}
      */
     static genUuid() {
@@ -21,7 +22,7 @@ class Utils {
 
     /**
      * Trim excess whitespace and leading '?' from a query string
-     * @private
+     * @public
      * @param {string} qs
      * @returns {string}
      */
@@ -33,7 +34,7 @@ class Utils {
 
     /**
      * Test whether or not input is a base64 string
-     * @private
+     * @public
      * @param {string} maybe64
      * @returns {boolean}
      */
