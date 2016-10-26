@@ -1,6 +1,6 @@
 {
   "name": "query-hash",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "QueryHash is a simple class for handling/creating query strings and base64 query string tokens",
   "main": "query-hash.js",
   "repository": "https://github.com/bcruddy/query-hash",
@@ -12,7 +12,7 @@
     "watch:client": "export NODE_ENV=dev && webpack --watch --config webpack.config.client.js",
     "build:server": "webpack --config webpack.config.server.js",
     "watch:server": "webpack --watch --config webpack.config.server.js",
-    "build:docs": "./node_modules/.bin/jsdoc src/QueryHash.js --destination ./docs ./README.md",
+    "build:docs": "./node_modules/.bin/jsdoc src/*.js --destination ./docs ./README.md",
     "build:all": "npm run lint && npm run build:server && npm run build:client && export NODE_ENV=dev && webpack --config webpack.config.client.js && npm run build:docs && npm run test"
   },
   "author": "@bcruddy",
